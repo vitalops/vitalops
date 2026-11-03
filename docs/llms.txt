@@ -1,6 +1,6 @@
 # vitalops
 
-> Open-source tools for running LLM inference, in pure Python with no dependencies. `vitalops plan`: will the model fit, how fast will it run, how many GPUs, what will it cost, for any Hugging Face model on any GPU. `vitalops bench`: measure an OpenAI-compatible endpoint and compare it with the plan.
+> Open-source tools for running LLMs in production, in pure Python with no dependencies. `vitalops plan`: will the model fit, how fast will it run, how many GPUs, what will it cost, for any Hugging Face model on any GPU. `vitalops bench`: measure an OpenAI-compatible endpoint and compare it with the plan.
 
 ## Prompt
 

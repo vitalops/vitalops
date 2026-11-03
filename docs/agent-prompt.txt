@@ -1,5 +1,5 @@
 # vitalops
-Open-source tools for running open-weight language models. `vitalops plan`: will the model fit, how fast will it run, how many GPUs, what will it cost (first-order estimates). `vitalops bench`: measure an OpenAI-compatible endpoint across concurrency levels, optionally next to the plan. Pure Python 3.9+, no dependencies. MIT.
+Open-source tools for running LLMs in production. `vitalops plan`: will the model fit, how fast will it run, how many GPUs, what will it cost (first-order estimates). `vitalops bench`: measure an OpenAI-compatible endpoint across concurrency levels, optionally next to the plan. Pure Python 3.9+, no dependencies. MIT.
 Repo: https://github.com/vitalops/vitalops
 Docs (raw Markdown): https://vitalops.ai/oss/llms.txt
 

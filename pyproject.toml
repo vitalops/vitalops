@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "vitalops"
 version = "0.1.0"
-description = "Will the model fit, how fast will it run, how many GPUs, what will it cost: a first-order inference planner for any Hugging Face model on any GPU, in pure Python."
+description = "Open-source tools for running LLMs in production: plan a deployment, benchmark a server. Pure Python, no dependencies."
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "VitalOps" }]

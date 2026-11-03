@@ -2,7 +2,7 @@
 
 # vitalops
 
-Plan an LLM deployment from a model and a GPU, then measure the server against the plan.
+Open-source tools for running LLMs in production.
 
 [Live planner, running this package in the browser](https://vitalops.ai/oss/) · [Docs](https://vitalops.ai/oss/docs/)
 

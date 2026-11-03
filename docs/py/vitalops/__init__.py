@@ -1,4 +1,4 @@
-"""vitalops: will the model fit, how fast will it run, how many GPUs, what will it cost.
+"""vitalops: open-source tools for running LLMs in production.
 
     import vitalops
     p = vitalops.plan("meta-llama/Llama-3.3-70B-Instruct", gpu="h100", users=64)

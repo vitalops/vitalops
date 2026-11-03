@@ -1,6 +1,6 @@
 # Introduction
 
-vitalops is a set of command-line tools and a Python library for running open-weight language models, pure Python with no dependencies, for Python 3.9 or newer:
+vitalops is a set of open-source tools for running LLMs in production: a command line and a Python library, pure Python with no dependencies, for Python 3.9 or newer:
 
 - `vitalops plan` answers four questions before you deploy: will the model fit, how fast will it run, how many GPUs does it take, and what will it cost.
 - `vitalops bench` measures the server once it runs, at the concurrency you care about, and puts the plan's estimate next to each measurement.

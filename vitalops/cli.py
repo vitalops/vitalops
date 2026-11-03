@@ -237,7 +237,7 @@ def cmd_ui(a) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(prog="vitalops", description="Open-source tools for LLM inference: plan a deployment from a model and a GPU, then measure the endpoint.")
+    ap = argparse.ArgumentParser(prog="vitalops", description="Open-source tools for running LLMs in production.")
     ap.add_argument("--version", action="version", version="vitalops " + __version__)
     sub = ap.add_subparsers(dest="cmd")
     p = sub.add_parser("plan", help="will the model fit, how fast, how many GPUs, what will it cost: first-order estimates from public specifications")

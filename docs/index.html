@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light">
-<title>vitalops · plan an LLM deployment, then measure it</title>
-<meta name="description" content="vitalops is open-source tooling for LLM inference in pure Python. vitalops plan estimates memory, tokens per second, time to first token, tensor-parallel layout and cost for any Hugging Face model on any GPU; vitalops bench measures an OpenAI-compatible endpoint against that plan.">
+<title>vitalops · open-source tools for running LLMs in production</title>
+<meta name="description" content="vitalops is a set of open-source tools for running LLMs in production, in pure Python. vitalops plan estimates memory, tokens per second, time to first token, tensor-parallel layout and cost for any Hugging Face model on any GPU; vitalops bench measures an OpenAI-compatible endpoint against that plan.">
 <link rel="canonical" href="https://vitalops.ai/oss/">
 <meta name="theme-color" content="#f5f6fa">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233f5cf6'/%3E%3Cpath d='M8 11h16M16 11v12' stroke='%23fff' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:title" content="vitalops">
-<meta property="og:description" content="Plan an LLM deployment from a model and a GPU, then measure the server against the plan. Pure Python, no dependencies.">
+<meta property="og:description" content="Open-source tools for running LLMs in production. Pure Python, no dependencies.">
 <meta property="og:url" content="https://vitalops.ai/oss/">
 <link rel="alternate" type="text/plain" href="agent-prompt.txt" title="Prompt for agents">
 <link rel="alternate" type="text/plain" href="llms.txt" title="Raw docs for agents">
@@ -75,9 +75,9 @@ section{padding:32px 0}
 
 <main>
 <section class="hero"><div class="wrap">
-  <span class="k">Open-source inference tooling · pure Python</span>
-  <h1>Plan an LLM deployment from a model and a GPU, then measure the server against the plan.</h1>
-  <p class="lede"><code>vitalops plan</code> answers whether a model fits, how fast it runs, how many GPUs it takes and what it costs. It reads a model's shapes from its <code>config.json</code> on the Hugging Face Hub, takes the GPU from a catalogue of datasheet figures, and applies a first-order model of inference: decode bound by memory bandwidth, prefill by compute, tensor parallelism over the real link. It finds the fewest GPUs that meet a time-to-first-token target and prices the result. <code>vitalops bench</code> then measures a running server at the concurrency you care about and prints the estimate next to each measurement. No dependencies; Python 3.9 or newer.</p>
+  <span class="k">Open source · pure Python · MIT</span>
+  <h1>Open-source tools for running LLMs in production.</h1>
+  <p class="lede"><code>vitalops plan</code> works out whether a model fits on a GPU, how fast it will run, how many GPUs it needs and what it will cost. <code>vitalops bench</code> measures a running server and compares it with the plan. No dependencies; Python 3.9 or newer.</p>
   <div class="install">
     <div><small>pip</small><pre>pip install vitalops
 vitalops plan Qwen/Qwen3-32B --gpu h100 --users 64
