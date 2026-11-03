@@ -10,9 +10,11 @@ The repository is [github.com/vitalops/tokplan](https://github.com/vitalops/tokp
 | `tokplan/models.py` | the model catalogue, the Hub loader, the `Model` dataclass |
 | `tokplan/physics.py` | the model of inference: `Scenario`, `perf`, `plan`, the constants |
 | `tokplan/cli.py` | the command line |
-| `tokplan/ui.py`, `tokplan/ui/` | `tokplan ui`: a local server and the page it serves |
+| `tokplan/web.py` | what the interactive page calls: `evaluate(state)` returns the plan, the report and the chart |
+| `tokplan/ui.py`, `tokplan/ui/` | `tokplan ui`: a local server with a JSON API over `web.py`, and the page it serves |
 | `tests/` | pytest |
 | `tools/onefile.py` | the single-file build |
+| `tools/site.py` | copies the package into `docs/py/` and the page's scripts into `docs/`; run it after a change |
 | `docs/` | this site, served by GitHub Pages |
 
 ## Running the tests
@@ -49,7 +51,7 @@ The arguments are id, name, total parameters, active parameters, layers, KV head
 
 ## Changing the physics
 
-The constants are at the top of `tokplan/physics.py`. A change to them or to a formula should come with the measurement that motivates it, and the tests that pin the website's figures will need the same change on the page (`lab-planner.js`), which lives in the vitalops.ai repository and is copied into `tokplan/ui/` and `docs/`.
+The constants are at the top of `tokplan/physics.py`. A change to them or to a formula should come with the measurement that motivates it, and the tests that pin the website's figures will need the same change in the JavaScript port in `lab-planner.js` that vitalops.ai uses. This site and `tokplan ui` call the package itself, so they follow automatically; run `python tools/site.py` to refresh `docs/py/`.
 
 ## The single-file build
 

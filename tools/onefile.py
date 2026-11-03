@@ -11,7 +11,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 PKG = os.path.join(ROOT, "tokplan")
-ORDER = ["hw.py", "models.py", "physics.py", "ui.py", "__init__.py", "cli.py"]
+ORDER = ["hw.py", "models.py", "physics.py", "ui.py", "__init__.py", "cli.py", "web.py"]
 
 
 def strip_relative_imports(src: str) -> str:
@@ -42,9 +42,9 @@ def main() -> None:
         src = strip_relative_imports(src)
         if name == "physics.py":
             src = re.sub(r"^def plan\(", "def plan_scenario(", src, flags=re.M)
-        if name == "cli.py":
-            src = re.sub(r"(?<![\w.])plan\(", "plan_scenario(", src)      # the CLI only ever calls the scenario planner
-            src = re.sub(r'\nif __name__ == "__main__":\n    sys\.exit\(main\(\)\)\n', "\n", src)
+        if name in ("cli.py", "web.py"):
+            src = re.sub(r"(?<![\w.])plan\(", "plan_scenario(", src)      # both only ever call the scenario planner
+            src = re.sub(r'\nif __name__ == "__main__":\n    sys\.exit\(main\(\)\)\n?', "\n", src)
         if name == "__init__.py":
             src = re.sub(r'^__version__ = .*$', "", src, flags=re.M)
             src = "_plan = plan_scenario\n" + src

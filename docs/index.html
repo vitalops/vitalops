@@ -117,7 +117,7 @@ tokplan · Qwen3-32B · fp8 weights, fp8 KV · 64 × (2,048 in + 300 out) · TTF
 </div></section>
 
 <section id="demo"><div class="wrap">
-  <div class="sec-h"><h2>The same estimate, interactive</h2><p>This is the planner from <a href="https://vitalops.ai/lab/">vitalops.ai</a>, running the same physics as the command line. <code>tokplan ui</code> serves it locally. The GPU is chosen in the carousel at the top of the panel.</p></div>
+  <div class="sec-h"><h2>The command line, interactive</h2><p>Every figure in this panel comes from tokplan's Python source, loaded into <a href="https://pyodide.org">Pyodide</a> (about 7 MB on the first visit). The command that prints the same report is under "Command line". Any public Hugging Face model can be loaded from the model list. <code>tokplan ui</code> serves the same panel from the installed package.</p></div>
   <div class="lab" data-lab-shell data-tabs="planner" data-gpu="h100"><noscript><p>The demo needs JavaScript.</p></noscript></div>
   <p class="lab-note">First-order estimates from public specifications, not measurements. Every formula is under "How this is calculated" in the panel.</p>
 </div></section>
@@ -137,6 +137,7 @@ tokplan · Qwen3-32B · fp8 weights, fp8 KV · 64 × (2,048 in + 300 out) · TTF
 <script>window.VO_HW_ROOT = 'https://vitalops.ai/';</script>
 <script src="hw.js"></script>
 <script src="lab-shell.js"></script>
+<script src="engine.js"></script>
 <script src="lab-planner.js"></script>
 </body>
 </html>

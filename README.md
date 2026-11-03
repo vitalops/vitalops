@@ -4,7 +4,7 @@
 
 Will the model fit, how fast will it run, how many GPUs, what will it cost.
 
-[Live demo](https://vitalops.ai/tokplan/) · [Docs](https://vitalops.ai/tokplan/docs/)
+[Live demo, running this package in the browser](https://vitalops.ai/tokplan/) · [Docs](https://vitalops.ai/tokplan/docs/)
 
 </div>
 
@@ -139,8 +139,10 @@ pytest
 python tools/onefile.py        # writes dist/tokplan.py, the single-file build
 ```
 
-The web demo in `docs/` and `tokplan ui` share their JavaScript with [vitalops.ai](https://vitalops.ai/lab/);
-the CLI's figures and the page's agree, and the tests check one scenario against the other.
+The web demo in `docs/` runs this package in the browser through Pyodide, and `tokplan ui` calls it over
+localhost; both go through `tokplan/web.py`. `python tools/site.py` copies the package into `docs/py/`
+after a change (the tests fail until it has). [vitalops.ai/lab](https://vitalops.ai/lab/) uses a JavaScript
+port of the same formulas; the tests pin one scenario to the figures it shows.
 
 ## Licence
 

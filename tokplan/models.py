@@ -217,7 +217,7 @@ def from_hub(repo: str, revision: str = "main") -> Model:
             active = active * total / total_shapes if active < total_shapes else total
     experts = cfg.get("num_local_experts") or cfg.get("num_experts") or cfg.get("n_routed_experts") or 0
     kv_per_layer = (cfg["kv_lora_rank"] + cfg.get("qk_rope_head_dim", 0)) if cfg.get("kv_lora_rank") else None
-    if cfg.get("sliding_window") and not note:
+    if cfg.get("sliding_window") and cfg.get("use_sliding_window", True) and not note:
         note = "some layers use a sliding window; the KV estimate assumes full attention on every layer"
     name = repo.split("/")[-1]
     return Model(id=repo, name=name, total=float(total), active=float(min(active, total)), layers=cfg["num_hidden_layers"], kv_heads=nkv, head_dim=hd, hidden=h,

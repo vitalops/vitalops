@@ -1,6 +1,8 @@
 /* Capacity planner: a first-order roofline estimate of what a model needs to serve
    a given load. Renders into every [data-lab="planner"]. No libraries, no network.
-   GPU specifications and the hardware card come from assets/js/hw.js (window.VO_HW). */
+   GPU specifications and the hardware card come from assets/js/hw.js (window.VO_HW).
+   When window.VO_PLANNER_ENGINE is set (tokplan's docs site, `tokplan ui`), every figure comes from
+   tokplan's Python instead of the port below: engine.evaluate(state) returns tokplan.web.evaluate's dict. */
 (function () {
   'use strict';
 
@@ -100,7 +102,20 @@
     '@media (max-width:1040px){.lp-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.lp-kpi:nth-child(4){border-left:0}.lp-kpi:nth-child(n+4){border-top:1px solid var(--line)}.lp-tbl{grid-template-columns:repeat(3,minmax(0,1fr))}}',
     '@media (max-width:860px){.lp{grid-template-columns:minmax(0,1fr)}.lp-ctl{border-right:0;border-bottom:1px solid var(--line)}}',
     '@media (max-width:520px){.lp-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.lp-kpi{border-left:1px solid var(--line)!important;border-top:1px solid var(--line)}.lp-kpi:nth-child(odd){border-left:0!important}.lp-kpi:nth-child(-n+2){border-top:0}.lp-kpi:first-child{grid-column:1/-1;border-left:0!important}.lp-kpi:nth-child(2){border-left:0!important;border-top:1px solid var(--line)}.lp-kpi:nth-child(3){border-top:1px solid var(--line)}.lp-tbl{grid-template-columns:repeat(2,minmax(0,1fr))}.lp-out{padding:16px}.lp-ctl{padding:16px}.lp-card .hwc{grid-template-columns:minmax(0,1fr)}.lp-card .hwc-ph{aspect-ratio:3/2;min-height:0}}',
-    '@media (prefers-reduced-motion:reduce){.lp-stk i{transition:none}}'
+    '.lp-load{font-family:var(--font);font-size:13.5px;color:var(--ink3);background:var(--white);border:1px solid var(--line);border-radius:12px;padding:28px 18px;display:flex;align-items:center;gap:12px;min-height:240px;justify-content:center;text-align:center}',
+    '.lp-load i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--brand);animation:lp-spin .8s linear infinite;flex:none}',
+    '@keyframes lp-spin{to{transform:rotate(360deg)}}',
+    '.lp-hub[hidden],.lp-hubmsg[hidden]{display:none!important}',
+    '.lp-hub{display:flex;gap:6px}.lp-hub .lp-num{font-family:var(--mono);font-size:12.5px}',
+    '.lp-hub button{font:inherit;font-size:12.5px;font-weight:600;color:#fff;background:var(--brand);border:0;border-radius:8px;padding:0 12px;cursor:pointer;flex:none}',
+    '.lp-hub button[disabled]{opacity:.6;cursor:default}',
+    '.lp-hubmsg{font-size:12px;color:var(--ink3);overflow-wrap:anywhere}.lp-hubmsg.lp-err{color:var(--bad)}',
+    '.lp-cli{border-top:1px solid var(--line);padding-top:10px;font-size:13px}',
+    '.lp-cli summary{cursor:pointer;font-weight:600;color:var(--ink)}',
+    '.lp-cli pre{margin:10px 0 0;font-family:var(--mono);font-size:11.5px;line-height:1.55;color:var(--ink2);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:pre}',
+    '.lp-cli pre b{font-weight:500;color:var(--ink)}',
+    '.lp-busy .lp-out{opacity:.72;transition:opacity .2s .15s}',
+    '@media (prefers-reduced-motion:reduce){.lp-stk i{transition:none}.lp-load i{animation:none}}'
   ].join('\n');
 
   function injectCSS() {
@@ -160,6 +175,8 @@
     step: 'One decode step at the operating point: max(memory time, compute time) + communication.',
     comm: 'Tensor-parallel all-reduce time per step and its share of the step. None at TP 1.',
     mem: 'Memory of one GPU drawn as its stacks or channels; memory is interleaved across them, so each shows the same fill.',
+    hub: 'Any public Hugging Face repository id. Its config.json is fetched from the Hub and read by tokplan\'s loader; gated models need the command line with HF_TOKEN.',
+    cli: 'The tokplan command that prints this report, and its output for the current settings.',
     regime: 'Memory-bandwidth bound when the bytes read per step take longer than the matmuls at the rate used; compute bound otherwise.'
   };
   var CARD_TIPS = ['Datasheet: HBM stacks or GDDR channels and the capacity of each.', 'Datasheet peak memory bandwidth; the estimate uses 75% of it.', 'Datasheet dense tensor-core rate for the format the matmuls run in.', 'Streaming multiprocessors (NVIDIA) or compute units (AMD) from the datasheet.', 'GPU-to-GPU link and its usable bandwidth per direction, from the datasheet; it carries the tensor-parallel all-reduces.', 'Datasheet board power.'];
@@ -258,13 +275,16 @@
     if (root.__lp) return; root.__lp = true;
     if (!HW) { root.innerHTML = '<p class="lp-note">The hardware catalogue (hw.js) did not load.</p>'; return; }
     var u = 'lp' + (++uid) + '-', L = window.VO_LAB;   // the demo shell, when there is one: it owns the GPU choice
-    var st = { model: 'qwen32', w: 'fp8', kv: 'fp8', gpu: L ? L.gpu : 'h100', price: HW.gpus[L ? L.gpu : 'h100'].price, users: 6, inp: 3, out: 2, slo: 2 };
+    var E = engine, models = E ? E.models : MODELS;
+    var st = { model: E ? 'Qwen/Qwen3-32B' : 'qwen32', w: 'fp8', kv: 'fp8', gpu: L ? L.gpu : 'h100', price: HW.gpus[L ? L.gpu : 'h100'].price, users: 6, inp: 3, out: 2, slo: 2 };
     root.innerHTML =
       '<div class="lp">' +
       '<div class="lp-ctl">' +
-        '<div class="lp-hd"><i></i>Capacity planner</div>' +
+        (E ? '<div class="lp-hd"' + tipAttr(E.tip) + '><i></i>' + HW.esc(E.label) + '</div>' : '<div class="lp-hd"><i></i>Capacity planner</div>') +
         '<div class="lp-f"><label for="' + u + 'm"' + tipAttr(TIP.model) + '>Model</label><select class="lp-sel" id="' + u + 'm" data-k="model">' +
-          MODELS.map(function (m) { return '<option value="' + m.id + '"' + (m.id === st.model ? ' selected' : '') + '>' + m.name + '</option>'; }).join('') + '</select></div>' +
+          models.map(function (m) { return '<option value="' + HW.esc(m.id) + '"' + (m.id === st.model ? ' selected' : '') + '>' + HW.esc(m.name) + '</option>'; }).join('') +
+          (E && E.loadModel ? '<option value="__hub">Another Hugging Face model…</option>' : '') + '</select>' +
+          (E && E.loadModel ? '<form class="lp-hub" hidden data-x="hub"><input class="lp-num" type="text" placeholder="org/model" aria-label="Hugging Face repository id" spellcheck="false" autocomplete="off"' + tipAttr(TIP.hub) + '><button type="submit">Load</button></form><div class="lp-hubmsg" data-x="hubmsg" hidden></div>' : '') + '</div>' +
         '<div class="lp-row2">' + seg(u + 'w', WPREC, st.w, 'Weights', TIP.w, { bf16: TIP.bf16, fp8: TIP.fp8, int4: TIP.int4 }) + seg(u + 'kv', KVPREC, st.kv, 'KV cache', TIP.kv, { bf16: TIP.kvbf16, fp8: TIP.kvfp8 }) + '</div>' +
         (L ? '' : '<div class="lp-f"><label for="' + u + 'g" data-tip="The GPU every replica runs on; its memory, bandwidth, tensor rates and link come from the catalogue.">GPU</label><select class="lp-sel" id="' + u + 'g" data-k="gpu">' +
           GPU_ORDER.map(function (k) { var g = HW.gpus[k]; return '<option value="' + k + '"' + (k === st.gpu ? ' selected' : '') + '>' + g.name + ' · ' + g.mem + ' GB</option>'; }).join('') + '</select></div>') +
@@ -300,6 +320,7 @@
           '<div><dt' + tipAttr(TIP.step) + '>Decode step</dt><dd data-x="step">—</dd></div>' +
           '<div><dt' + tipAttr(TIP.comm) + '>Of which communication</dt><dd data-x="comm">—</dd></div>' +
         '</dl>' +
+        (E ? '<details class="lp-cli"><summary' + tipAttr(TIP.cli) + '>Command line</summary><pre data-x="cli"></pre></details>' : '') +
         '<details class="lp-how"><summary>How this is calculated</summary><ul>' +
           '<li>Weights take <code>params × bytes</code> (bf16 2, fp8 1, int4 0.56 with group scales), split across the tensor-parallel group. Each GPU also holds <code>8% of memory + 1.5 GB</code> for activations, CUDA graphs and allocator slack; what is left holds the KV cache. GB means 2<sup>30</sup> bytes, as the driver reports it. The memory drawing shows the GPU\'s HBM stacks (or GDDR channels); memory is interleaved across them, so every stack holds the same share.</li>' +
           '<li>KV cache per token is <code>2 × layers × KV heads × head dim × bytes</code> (DeepSeek-V3 caches a 576-wide latent per layer). Each request reserves room for prompt plus output.</li>' +
@@ -315,7 +336,7 @@
     var $ = function (sel) { return root.querySelector(sel); };
     var X = {}; [].forEach.call(root.querySelectorAll('[data-x]'), function (e) { X[e.getAttribute('data-x')] = e; });
     var stkI = X.stk.querySelectorAll('i');
-    var cardGPU = null, memBar = null;
+    var cardGPU = null, memBar = null, reqSeq = 0, lastChart = null;
 
     root.addEventListener('click', function (e) {
       var b = e.target.closest('.lp-seg button'); if (!b || !root.contains(b)) return;
@@ -326,7 +347,12 @@
     });
     root.addEventListener('input', function (e) {
       var t = e.target, k = t.getAttribute('data-k'), r = t.getAttribute('data-r');
-      if (k === 'model') st.model = t.value;
+      if (k === 'model') {
+        if (t.value === '__hub') { X.hub.hidden = false; X.hub.querySelector('input').focus(); return; }
+        if (X.hub) { X.hub.hidden = true; X.hubmsg.hidden = true; }
+        st.model = t.value;
+      }
+      else if (t.closest && t.closest('.lp-hub')) return;
       else if (k === 'gpu') { st.gpu = t.value; st.price = HW.gpus[st.gpu].price; $('#' + u + 'p').value = st.price.toFixed(2); }
       else if (k === 'price') { var v = parseFloat(t.value); st.price = isFinite(v) && v >= 0 ? v : 0; }
       else if (r) { st[r.slice(u.length)] = +t.value; }
@@ -376,13 +402,48 @@
         var inp = $('#' + u + a[0]); inp.style.setProperty('--p', (st[a[0]] / (a[1].length - 1) * 100) + '%');
         root.querySelector('[data-o="' + u + a[0] + '"]').textContent = a[2](a[1][st[a[0]]]);
       });
-      var m = byId(MODELS, st.model), g = HW.gpus[st.gpu];
-      var wb = WPREC.filter(function (x) { return x[0] === st.w; })[0][1];
-      var kvb = KVPREC.filter(function (x) { return x[0] === st.kv; })[0][1];
+      var g = HW.gpus[st.gpu];
       var rt = rate(g, st.w);
       if (cardGPU !== st.gpu + '/' + st.w) { cardGPU = st.gpu + '/' + st.w; buildCard(g, rt, st.w); }
-      var s = { m: m, g: g, wb: wb, wname: st.w, rate: rt, kvTok: kvBytesPerToken(m, kvb), users: USERS[st.users], inTok: PROMPT[st.inp], outTok: OUTPUT[st.out], slo: SLO[st.slo] };
-      var r = plan(s);
+      var s = { g: g, wname: st.w, rate: rt, users: USERS[st.users], inTok: PROMPT[st.inp], outTok: OUTPUT[st.out], slo: SLO[st.slo] };
+      if (!E) {
+        var m = byId(MODELS, st.model);
+        s.m = m; s.wb = WPREC.filter(function (x) { return x[0] === st.w; })[0][1];
+        s.kvTok = kvBytesPerToken(m, KVPREC.filter(function (x) { return x[0] === st.kv; })[0][1]);
+        render(s, plan(s), null);
+        return;
+      }
+      var seq = ++reqSeq, req = { model: st.model, gpu: st.gpu, weights: st.w, kv: st.kv, users: s.users, prompt: s.inTok, output: s.outTok, slo: s.slo, price: st.price };
+      root.classList.add('lp-busy');
+      Promise.resolve().then(function () { return E.evaluate(req); }).then(function (res) {
+        if (seq !== reqSeq) return;
+        root.classList.remove('lp-busy');
+        if (res.error) { X.alert.innerHTML = '<div class="lp-alert lp-err">' + HW.esc(res.error) + '</div>'; return; }
+        var P = res.plan;
+        s.kvTok = P.kv_bytes_per_token;
+        s.rate = { tf: P.rate_tflops, as: P.rate_dtype };
+        X.cli.innerHTML = '<b>$ ' + HW.esc(res.command) + '</b>\n' + HW.esc(res.report);
+        render(s, fromPy(res), res.chart);
+      }, function (err) {
+        if (seq !== reqSeq) return;
+        root.classList.remove('lp-busy');
+        X.alert.innerHTML = '<div class="lp-alert lp-err">' + HW.esc(String(err && err.message || err)) + '</div>';
+      });
+    }
+
+    // tokplan.web.evaluate's dict, in the shape render() takes
+    function fromPy(res) {
+      var P = res.plan;
+      if (!P.fits) return { fail: true, weights: P.weight_bytes, act: res.runtime_bytes, memB: P.mem_bytes, reason: P.reason, perReq: P.kv_bytes_per_request };
+      var Lo = P.layout, f = Lo.perf;
+      return { tp: Lo.tp, replicas: Lo.replicas, gpus: Lo.gpus, b: Lo.batch, maxB: Lo.max_batch, wPer: Lo.weights_per_gpu, act: Lo.runtime_per_gpu, kvPer: Lo.kv_per_gpu,
+        kvCap: Lo.kv_cap, sloOk: Lo.slo_ok, memB: P.mem_bytes, perReq: P.kv_bytes_per_request, weights: P.weight_bytes, cpm: P.cost_per_1m_output, month: P.cost_per_month,
+        p: { tStep: f.step_s, tW: f.t_weights_s, tKV: f.t_kv_s, tCmp: f.t_compute_s, tComm: f.t_comm_s, tPre: Lo.batch * f.prefill_s / P.output, user: f.user_tps,
+          agg: f.agg_tps, ttft: f.ttft_s, memBound: f.memory_bound } };
+    }
+
+    function render(s, r, pts) {
+      var g = s.g, rt = s.rate;
       X.rate.textContent = HW.fmt(rt.tf) + ' TFLOPS ' + rt.as;
       var alert = '';
       if (r.fail) {
@@ -390,7 +451,7 @@
         ['user', 'agg', 'ttft', 'cpm', 'tp', 'batch', 'rps', 'kvall', 'step', 'comm'].forEach(function (k) { X[k].textContent = '—'; });
         X.slo.textContent = ''; X.month.textContent = ''; X.slo.className = '';
         X.kvreq.textContent = fmtGB(s.kvTok * (s.inTok + s.outTok));
-        X.alert.innerHTML = '<div class="lp-alert lp-err">' + fmtGB(r.weights) + ' of weights plus the KV cache don\'t fit on 8 × ' + g.name + '. Lower-precision weights, a larger GPU or shorter contexts would be needed.</div>';
+        X.alert.innerHTML = '<div class="lp-alert lp-err">' + (r.reason ? 'Does not fit: ' + HW.esc(r.reason) + '.' : fmtGB(r.weights) + ' of weights plus the KV cache don\'t fit on 8 × ' + g.name + '.') + ' Lower-precision weights, a larger GPU or shorter contexts would be needed.</div>';
         var wPer8 = r.weights / 8;
         setMem(g, Math.min(wPer8, r.memB), 0, Math.min(r.act, Math.max(0, r.memB - wPer8)), 8);
         setStack(null);
@@ -406,9 +467,9 @@
       X.slo.textContent = r.sloOk ? 'within ' + s.slo + ' ms' : 'misses ' + s.slo + ' ms';
       X.slo.className = r.sloOk ? 'lp-ok' : 'lp-bad';
       var hourly = r.gpus * st.price;
-      var cpm = hourly / (p.agg * r.replicas * 3600) * 1e6;
+      var cpm = r.cpm != null ? r.cpm : hourly / (p.agg * r.replicas * 3600) * 1e6;
       X.cpm.textContent = st.price > 0 ? fmtUSD(cpm) : '—';
-      X.month.textContent = st.price > 0 ? fmtUSD(hourly * 730) + ' a month' : 'set a GPU price';
+      X.month.textContent = st.price > 0 ? fmtUSD(r.month != null ? r.month : hourly * 730) + ' a month' : 'set a GPU price';
       X.tp.textContent = 'TP' + r.tp + ' × ' + r.replicas;
       X.batch.textContent = r.b + ' (max ' + r.maxB + ')';
       X.rps.textContent = fmtN(p.agg * r.replicas / s.outTok);
@@ -421,7 +482,8 @@
       setMem(g, r.wPer, r.kvPer, r.act, r.tp);
       setStack(p);
       X.regime.textContent = p.memBound ? 'memory-bandwidth bound' : 'compute bound';
-      chart(s, r);
+      lastChart = [s, r, pts];
+      chart(s, r, pts);
     }
 
     // stacked bar: how the time per output token splits at the operating point
@@ -438,10 +500,12 @@
     }
 
     function nice(v) { var e = Math.pow(10, Math.floor(Math.log10(v))), f = v / e; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * e; }
-    function chart(s, r) {
+    // pts: [{b, agg, user}] from tokplan.web, or computed here with the port's perf()
+    function chart(s, r, pyPts) {
       var W = Math.round(Math.max(300, Math.min(640, X.chart.clientWidth || 600))), H = Math.round(Math.max(180, W * 0.36)), L = 40, R = 34, T = 12, B = 26;
       var maxB = Math.max(2, r.maxB), n = 48, pts = [];
-      for (var i = 0; i <= n; i++) { var b = Math.max(1, Math.round(Math.exp(Math.log(maxB) * i / n))); if (!pts.length || pts[pts.length - 1].b !== b) pts.push({ b: b, p: perf(s, r.tp, b) }); }
+      if (pyPts) pts = pyPts.map(function (q) { return { b: q.b, p: { agg: q.agg, user: q.user } }; });
+      else for (var i = 0; i <= n; i++) { var b = Math.max(1, Math.round(Math.exp(Math.log(maxB) * i / n))); if (!pts.length || pts[pts.length - 1].b !== b) pts.push({ b: b, p: perf(s, r.tp, b) }); }
       var aMax = nice(Math.max.apply(null, pts.map(function (q) { return q.p.agg; })) * 1.08);
       var uMax = nice(Math.max.apply(null, pts.map(function (q) { return q.p.user; })) * 1.08);
       var x = function (b) { return L + Math.log(b) / Math.log(maxB) * (W - L - R); };
@@ -454,7 +518,7 @@
         o.push('<text x="' + (L - 6) + '" y="' + (yy + 3).toFixed(1) + '" text-anchor="end">' + short(aMax * (1 - k / 4)) + '</text>');
         o.push('<text x="' + (W - R + 6) + '" y="' + (yy + 3).toFixed(1) + '">' + short(uMax * (1 - k / 4)) + '</text>');
       }
-      for (var t = 1; t <= maxB; t *= 4) o.push('<text x="' + x(t).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle">' + t + '</text>');
+      for (var t = 1; t <= maxB; t *= 4) if (x(t) < W - R - 44) o.push('<text x="' + x(t).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle">' + t + '</text>');
       o.push('<text x="' + (W - R) + '" y="' + (H - 8) + '" text-anchor="end">batch</text>');
       var da = pts.map(function (q, j) { return (j ? 'L' : 'M') + x(q.b).toFixed(1) + ' ' + ya(q.p.agg).toFixed(1); }).join('');
       var du = pts.map(function (q, j) { return (j ? 'L' : 'M') + x(q.b).toFixed(1) + ' ' + yu(q.p.user).toFixed(1); }).join('');
@@ -470,14 +534,44 @@
     }
     function short(v) { return v >= 1e4 ? Math.round(v / 1e3) + 'k' : v >= 1e3 ? (v / 1e3).toFixed(1).replace(/\.0$/, '') + 'k' : String(Math.round(v)); }
 
+    if (X.hub) X.hub.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var inp = X.hub.querySelector('input'), btn = X.hub.querySelector('button'), repo = inp.value.trim().replace(/^https?:\/\/huggingface\.co\//, '').replace(/\/+$/, '');
+      if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) { hubMsg('Use the form org/model, for example Qwen/Qwen2.5-14B-Instruct.', true); return; }
+      btn.disabled = true; hubMsg('Reading ' + repo + ' from the Hub…', false);
+      Promise.resolve().then(function () { return E.loadModel(repo); }).then(function (mi) {
+        btn.disabled = false;
+        var sel = root.querySelector('[data-k="model"]'), o = sel.querySelector('option[value="' + window.CSS.escape(mi.id) + '"]');
+        if (!o) { o = document.createElement('option'); o.value = mi.id; o.textContent = mi.id; sel.insertBefore(o, sel.querySelector('option[value="__hub"]')); }
+        sel.value = mi.id; st.model = mi.id; X.hub.hidden = true;
+        hubMsg(mi.id + ': ' + (mi.total / 1e9).toFixed(1) + 'B params' + (mi.moe ? ' (' + (mi.active / 1e9).toFixed(1) + 'B active)' : '') + ', ' + mi.layers + ' layers, ' + mi.kv_heads + ' KV heads × ' + mi.head_dim + (mi.note ? '. ' + mi.note.charAt(0).toUpperCase() + mi.note.slice(1) : ''), false);
+        update();
+      }, function (err) { btn.disabled = false; hubMsg(String(err && err.message || err), true); });
+    });
+    function hubMsg(t, bad) { X.hubmsg.hidden = false; X.hubmsg.textContent = t; X.hubmsg.className = 'lp-hubmsg' + (bad ? ' lp-err' : ''); }
+
     if (L) L.subscribe(function (m) { if (m.kind === 'gpu' && m.gpu !== st.gpu) { st.gpu = m.gpu; st.price = HW.gpus[st.gpu].price; $('#' + u + 'p').value = st.price.toFixed(2); update(); } });
     update();
     if ('ResizeObserver' in window) {
       var lastW = 0;
-      new ResizeObserver(function () { var w = X.chart.clientWidth; if (Math.abs(w - lastW) > 24) { lastW = w; update(); } }).observe(X.chart);
+      new ResizeObserver(function () { var w = X.chart.clientWidth; if (Math.abs(w - lastW) > 24) { lastW = w; if (lastChart) chart.apply(null, lastChart); } }).observe(X.chart);
     }
   }
 
-  function init() { injectCSS(); [].forEach.call(document.querySelectorAll('[data-lab="planner"]'), mount); }
+  var engine = null;
+  function init() {
+    injectCSS();
+    var roots = [].slice.call(document.querySelectorAll('[data-lab="planner"]')), E = window.VO_PLANNER_ENGINE;
+    if (!E) { roots.forEach(mount); return; }
+    roots.forEach(function (root) { root.innerHTML = '<div class="lp-load" role="status"><i></i><span>Loading…</span></div>'; });
+    if (E.onStatus) E.onStatus(function (msg) { roots.forEach(function (root) { var sp = root.querySelector('.lp-load span'); if (sp) sp.textContent = msg; }); });
+    E.ready.then(function () { engine = E; roots.forEach(mount); }, function (err) {
+      roots.forEach(function (root) {
+        mount(root);
+        var a = root.querySelector('[data-x="alert"]');
+        if (a) a.insertAdjacentHTML('beforebegin', '<div class="lp-alert">tokplan\'s Python did not load (' + HW.esc(String(err && err.message || err)) + '). These figures come from the JavaScript port of the same formulas.</div>');
+      });
+    });
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

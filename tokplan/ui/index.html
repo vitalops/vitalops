@@ -23,13 +23,14 @@ footer a{color:var(--brand)}
 </head>
 <body>
 <div class="wrap">
-  <header><h1>tokplan</h1><p>The same estimate as <code>tokplan MODEL --gpu GPU</code>, interactive. Pick the GPU at the top of the panel.</p></header>
+  <header><h1>tokplan</h1><p>The report <code>tokplan MODEL --gpu GPU</code> prints, interactive. Every figure comes from the installed package.</p></header>
   <div class="lab" data-lab-shell data-tabs="planner" data-gpu="h100"><noscript><p>This page needs JavaScript.</p></noscript></div>
   <footer>First-order estimates from public specifications, not measurements. Assumptions are under "How this is calculated". Source and docs: <a href="https://github.com/vitalops/tokplan">github.com/vitalops/tokplan</a> · by <a href="https://vitalops.ai">VitalOps</a>.</footer>
 </div>
 <script>window.VO_HW_ROOT = 'https://vitalops.ai/';</script>
 <script src="hw.js"></script>
 <script src="lab-shell.js"></script>
+<script src="engine.js"></script>
 <script src="lab-planner.js"></script>
 </body>
 </html>

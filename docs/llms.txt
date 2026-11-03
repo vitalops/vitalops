@@ -21,7 +21,7 @@
 ## How it works
 
 - [The physics](https://vitalops.ai/tokplan/docs/content/physics.md): every formula and constant, what is not modelled, calibrating against a measurement
-- [The interactive planner](https://vitalops.ai/tokplan/docs/content/ui.md): tokplan ui and the web page, the same physics in JavaScript
+- [The interactive planner](https://vitalops.ai/tokplan/docs/content/ui.md): tokplan ui and the web page, which run tokplan's Python (Pyodide on the site, the local package under tokplan ui)
 - [Contributing](https://vitalops.ai/tokplan/docs/content/contributing.md): layout, tests, adding a GPU or a model, the one-file build
 
 ## Source
