@@ -1,0 +1,37 @@
+# tokplan
+First-order inference planner for open-weight language models: will the model fit, how fast will it run, how many GPUs, what will it cost. Pure Python 3.9+, no dependencies. MIT.
+Repo: https://github.com/vitalops/tokplan
+Docs (raw Markdown): https://vitalops.ai/tokplan/llms.txt
+
+## What
+Reads a model's shapes (parameters, layers, KV heads, head dim, hidden size, expert layout) from a built-in catalogue or from a Hugging Face repository's config.json and checkpoint size; takes the GPU from a catalogue of datasheet figures; applies a first-order model (decode bound by memory bandwidth, prefill by compute, tensor parallelism over the real link); searches TP 1/2/4/8 and replica counts for the fewest GPUs that meet a time-to-first-token target; prices the result. The figures are estimates for planning, not measurements; every assumption is printed.
+
+## Install
+pip install tokplan
+Or one file: https://github.com/vitalops/tokplan/releases/download/onefile/tokplan.py  (python tokplan.py ..., or put it on sys.path and import tokplan)
+
+## CLI
+tokplan MODEL [--gpu h100] [--users 64] [--prompt 2048] [--output 300] [--weights bf16|fp8|int4] [--kv bf16|fp8] [--slo 500] [--price 2.50] [--tp 1|2|4|8] [--offline] [--json] [-q]
+tokplan MODEL --all-gpus      one row per GPU
+tokplan gpus | tokplan models   the catalogues (--json for machine-readable)
+tokplan ui [--port N]           the interactive planner, served locally
+MODEL: a Hub id (Qwen/Qwen3-32B, meta-llama/Llama-3.3-70B-Instruct) or a catalogue name (qwen3-32b, llama-70b, deepseek-v3, gpt-oss-120b, ...). GPU keys: h100 h200 b200 a100 l40s rtx5090 mi300x agx_orin.
+Exit codes: 0 fits, 1 does not fit (up to TP8), 2 bad argument or Hub unreadable. Gated repos need HF_TOKEN. Configs cache a week in ~/.cache/tokplan. --offline: catalogue only.
+
+## API
+import tokplan
+p = tokplan.plan("Qwen/Qwen3-32B", gpu="h100", weights="fp8", kv="fp8", users=64, prompt=2048, output=300, slo_ms=500, price=None, tp=None, offline=False)
+p.fits; p.reason; p.layout.tp; p.layout.replicas; p.layout.gpus; p.layout.batch; p.layout.max_batch
+p.user_tps; p.agg_tps; p.ttft_ms; p.requests_per_s; p.cost_per_1m_output; p.cost_per_month
+p.layout.perf: step_s, t_weights_s, t_kv_s, t_compute_s, t_comm_s, prefill_s, ttft_s, user_tps, agg_tps, memory_bound
+p.options: every TP that fits; p.to_dict(): the JSON the CLI prints
+tokplan.fit(model, gpu, **kw) -> bool
+tokplan.perf(Scenario(model=Model, gpu=GPU, weights, kv, users, prompt, output, slo_ms, price, tp), tp, batch) -> Perf
+tokplan.load_model(name_or_hub_id, offline=False) -> Model; tokplan.from_hub(repo); tokplan.catalogue(); tokplan.get_gpu(key) -> GPU; tokplan.GPUS
+A Model or GPU you construct (dataclasses in tokplan.models / tokplan.hw) is accepted wherever a name is.
+
+## The model, in one paragraph
+weights = params × bytes (bf16 2, fp8 1, int4 0.5625); KV/token = layers × 2 × kv_heads × head_dim × bytes (or layers × latent width for MLA); each request reserves prompt+output tokens; reserve 8% of memory + 1.5 GB. step = max((weights_read + b×(P+O/2)×kv_tok)/(0.75×bw×tp), 2×active×b/(0.5×rate×tp)) + 2×layers×(b×hidden×2×2(tp−1)/tp / link + latency); MoE weights_read = total × (1−(1−active/total)^b); prefill = P×2×active/(0.6×rate×tp) + comms; ttft = prefill + step; user_tps = (1/step)/(1 + b×prefill/O/step); cost = gpus × $/h ÷ (agg_tps×3600/1e6). rate: bf16, fp8 where the GPU has it (A100 does not), fp4 for int4 on Blackwell. All-reduce latency 8 µs NVLink/IF, 25 µs PCIe.
+
+## Not modelled
+Queueing, speculative decoding, prefix caching, chunked prefill, small-batch kernel efficiency, pipeline/expert parallelism, sliding-window attention (Gemma 3, gpt-oss overstate KV). Expect measured figures to differ by tens of percent. Calibrate by changing the constants at the top of tokplan/physics.py against a measurement.

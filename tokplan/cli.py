@@ -137,10 +137,10 @@ def cmd_plan(a) -> int:
 def cmd_gpus(a) -> int:
     if a.json:
         print(json.dumps({k: asdict(g) for k, g in GPUS.items()}, indent=2)); return 0
-    print("  %-8s %-22s %-13s %-8s %-22s %-21s %s" % ("key", "name", "memory", "bw TB/s", "dense TFLOPS", "link", "$/h"))
+    print("  %-8s %-22s %-13s %-8s %-30s %-21s %s" % ("key", "name", "memory", "bw TB/s", "dense TFLOPS", "link", "$/h"))
     for k, g in GPUS.items():
         fl = " ".join("%s %s" % (d, n(v)) for d, v in g.flops.items() if d in ("bf16", "fp8", "fp4"))
-        print("  %-8s %-22s %-13s %-8s %-22s %-21s %.2f" % (k, g.name, "%d GB %s" % (g.mem, g.mem_type), ("%.2f" % g.bw).rstrip("0").rstrip("."), fl, "%s %d GB/s" % (g.link_name, g.link_gbps), g.price))
+        print("  %-8s %-22s %-13s %-8s %-30s %-21s %.2f" % (k, g.name, "%d GB %s" % (g.mem, g.mem_type), "%g" % g.bw, fl, "%s %d GB/s" % (g.link_name, g.link_gbps), g.price))
     return 0
 
 

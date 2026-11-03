@@ -1,0 +1,65 @@
+# Contributing
+
+The repository is [github.com/vitalops/tokplan](https://github.com/vitalops/tokplan), MIT licensed. Corrections to a catalogue figure, new hardware, new models and fixes to the model of inference are welcome as pull requests.
+
+## Layout
+
+| Path | What it is |
+|---|---|
+| `tokplan/hw.py` | the GPU catalogue and the `GPU` dataclass |
+| `tokplan/models.py` | the model catalogue, the Hub loader, the `Model` dataclass |
+| `tokplan/physics.py` | the model of inference: `Scenario`, `perf`, `plan`, the constants |
+| `tokplan/cli.py` | the command line |
+| `tokplan/ui.py`, `tokplan/ui/` | `tokplan ui`: a local server and the page it serves |
+| `tests/` | pytest |
+| `tools/onefile.py` | the single-file build |
+| `docs/` | this site, served by GitHub Pages |
+
+## Running the tests
+
+```
+git clone https://github.com/vitalops/tokplan && cd tokplan
+pip install -e .[dev]
+pytest
+```
+
+The tests cover the physics against the website's figures, the layout search, the fit check, the MoE weight read, the parameter count from config shapes, and the command line's JSON and exit codes. They run offline.
+
+## Adding a GPU
+
+Add an entry to `GPUS` in `tokplan/hw.py`:
+
+```python
+"h100": _g(key="h100", name="H100 SXM", vendor="nvidia", arch="sm_90", sms=132, mem=80, mem_type="HBM3", stacks=5, stack_gb=16, bw=3.35,
+           flops={"fp32": 67, "bf16": 989, "fp8": 1979, "int8": 1979}, link_name="NVLink 4", link_gbps=450, tdp=700, price=2.50),
+```
+
+Every figure except `price` and `latency_ns` must come from the vendor's datasheet; put the link in the pull request. `flops` holds dense rates (not the sparse ones datasheets headline), per format the tensor cores support; leave out a format the GPU does not have, because the planner uses the list to decide which rate the matmuls run at. `link_gbps` is per direction. `mem` is the vendor's usable figure. Name PCIe links with the word `PCIe`, because the all-reduce latency is chosen from the name. Add an alias to `ALIASES` if people call it something shorter. The same figures go into `hw.js` for the web page; keep the two in step.
+
+## Adding a model
+
+Add an entry to `CATALOGUE` in `tokplan/models.py`:
+
+```python
+_m("Qwen/Qwen3-32B", "Qwen3-32B", 32.8e9, 32.8e9, 64, 8, 128, 5120),
+_m("Qwen/Qwen3-235B-A22B", "Qwen3-235B-A22B (MoE)", 235e9, 22e9, 94, 4, 128, 4096, experts=128, top_k=8),
+```
+
+The arguments are id, name, total parameters, active parameters, layers, KV heads, head dimension, hidden size, then `kv_per_layer` for latent attention, `experts` and `top_k` for a mixture of experts, and a `note` for a caveat such as sliding-window layers. Take the shapes from the repository's `config.json` and the parameter count from the checkpoint size; a model that is not in the catalogue already works through the Hub loader, so the catalogue is for offline use and for the names people type. Add aliases to `_ALIASES`.
+
+## Changing the physics
+
+The constants are at the top of `tokplan/physics.py`. A change to them or to a formula should come with the measurement that motivates it, and the tests that pin the website's figures will need the same change on the page (`lab-planner.js`), which lives in the vitalops.ai repository and is copied into `tokplan/ui/` and `docs/`.
+
+## The single-file build
+
+```
+python tools/onefile.py
+python dist/tokplan.py qwen3-32b --offline
+```
+
+`tools/onefile.py` concatenates the modules in dependency order, strips the relative imports and embeds the UI page, and writes `dist/tokplan.py`. CI runs it on every push; a release attaches it as `tokplan.py`.
+
+## Style
+
+Plain Python 3.9, standard library only, no dependencies at runtime. Dataclasses for data, functions for the maths, no classes with behaviour. British English in text. Numbers on screen are estimates and the wording should say so where it matters.
