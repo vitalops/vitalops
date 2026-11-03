@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="color-scheme:light">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +7,9 @@
 <title>vitalops · open-source tools for running LLMs in production</title>
 <meta name="description" content="vitalops is a set of open-source tools for running LLMs in production, in pure Python. vitalops plan estimates memory, tokens per second, time to first token, tensor-parallel layout and cost for any Hugging Face model on any GPU; vitalops bench measures an OpenAI-compatible endpoint against that plan.">
 <link rel="canonical" href="https://vitalops.ai/oss/">
-<meta name="theme-color" content="#f5f6fa">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233f5cf6'/%3E%3Cpath d='M8 11h16M16 11v12' stroke='%23fff' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#0b1020">
+<link rel="icon" type="image/svg+xml" href="https://vitalops.ai/assets/vo-mark.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://vitalops.ai/assets/favicon-32.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="vitalops">
 <meta property="og:description" content="Open-source tools for running LLMs in production. Pure Python, no dependencies.">
@@ -18,134 +19,300 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#f5f6fa;--white:#fff;--ink:#0f172a;--ink2:#334155;--ink3:#5b687c;--ink4:#94a3b8;--line:#e2e8f0;--line2:#eef2f7;--brand:#3f5cf6;--brand2:#637fff;--brandD:#2737bd;--brand50:#eff4ff;--brand100:#dbe5ff;--brand200:#bdcdff;--ok:#059669;--warn:#b45309;--bad:#be123c;--font:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;--mono:'DM Mono',ui-monospace,monospace}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink2);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
-@media(max-width:600px){.wrap{padding:0 16px}}
-h1,h2,h3{color:var(--ink);letter-spacing:-.025em;line-height:1.15}
-h2{font-size:clamp(24px,2.6vw,30px);font-weight:800}
-h3{font-size:17px;font-weight:700}
-code{font-family:var(--mono);font-size:.92em;color:var(--ink);background:var(--white);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
-pre{font-family:var(--mono);font-size:13px;line-height:1.55;color:var(--ink);background:var(--white);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;white-space:pre}
-pre code{border:0;padding:0;background:none;font-size:inherit}
-.top{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.top-in{display:flex;align-items:center;justify-content:space-between;height:58px;gap:16px}
-.logo{display:flex;align-items:center;gap:9px;font-weight:700;color:var(--ink);font-size:16px}
-.logo i{width:26px;height:26px;border-radius:7px;background:var(--brand);display:inline-grid;place-items:center;color:#fff;font-style:normal;font-family:var(--mono);font-size:14px;font-weight:700}
-.links{display:flex;gap:4px}
-.links a{padding:7px 9px;border-radius:7px;font-size:14px;font-weight:500;color:var(--ink2)}
-@media(max-width:420px){.links a{padding:6px 6px;font-size:13px}.top-in{gap:8px}}
-.links a:hover{background:var(--bg);color:var(--ink);text-decoration:none}
-.hero{padding:56px 0 28px}
-.hero h1{font-size:clamp(30px,4vw,46px);font-weight:800;letter-spacing:-.035em;max-width:22ch}
-.hero .lede{font-size:18px;max-width:64ch;margin-top:16px}
-.k{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--brand);margin-bottom:10px}
-.install{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px;max-width:820px}
-.install div{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
-.install small{display:block;font-size:12px;color:var(--ink3);margin-bottom:6px}
-.install pre{border:0;padding:0;background:none;font-size:13.5px;overflow-x:auto}
-@media(max-width:700px){.install{grid-template-columns:1fr}}
-.pill{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:var(--white);font-size:14px;font-weight:600;color:var(--ink2);margin:16px 8px 0 0}
-.pill:hover{border-color:var(--brand200);color:var(--brand);text-decoration:none}
-section{padding:32px 0}
-.sec-h{max-width:720px;margin-bottom:16px}
-.sec-h p{margin-top:8px;color:var(--ink2)}
-.transcript{font-size:12.5px}
-.transcript .c{color:var(--ink3)}
-.lab{min-height:300px}
-.lab-note{font-size:13px;color:var(--ink3);margin-top:10px}
-.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
-.card h3{margin-bottom:6px}
-.card p{font-size:14.5px;color:var(--ink2)}
-.card p+p{margin-top:8px}
-@media(max-width:900px){.cols{grid-template-columns:1fr}}
-.foot{padding:28px 0 40px;border-top:1px solid var(--line);font-size:13.5px;color:var(--ink3);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-</style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
-<header class="top"><div class="wrap top-in">
-  <a class="logo" href="./"><i>v</i>vitalops</a>
-  <nav class="links"><a href="docs/">Docs</a><a href="#demo">Planner</a><a href="#bench">Bench</a><a href="https://github.com/vitalops/vitalops">GitHub</a><a href="https://pypi.org/project/vitalops/">PyPI</a></nav>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><mask id="ptm"><path fill="white" d="M50,8 C57,8 63,11 67,16 L85,46 C89,52 89,59 86,65 C83,71 77,74 71,74 L29,74 C23,74 17,71 14,65 C11,59 11,52 15,46 L33,16 C37,11 43,8 50,8 Z"/><circle cx="50" cy="46" r="20" fill="black"/></mask></defs>
+  <symbol id="vo-logo" viewBox="-8 -8 116 116"><g transform="rotate(180 50 50)"><rect width="100" height="100" fill="currentColor" mask="url(#ptm)"/></g></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7M7 16h10"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+  <symbol id="i-up-right" viewBox="0 0 24 24"><path d="M7 7h10v10M7 17 17 7"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-package" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/></symbol>
+  <symbol id="i-git" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></symbol>
+  <symbol id="i-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></symbol>
+</svg>
+
+<header class="nav"><div class="wrap nav-in">
+  <a class="logo" href="https://vitalops.ai/" aria-label="VitalOps"><svg aria-hidden="true"><use href="#vo-logo"/></svg>VitalOps<em>/ <b>oss</b></em></a>
+  <nav class="nav-links" aria-label="Page">
+    <a href="#commands">Commands</a><a href="#plan">Plan</a><a href="#demo">Live planner</a><a href="#bench">Bench</a><a href="#install">Install</a>
+  </nav>
+  <div class="nav-act">
+    <a class="nav-gh" href="https://github.com/vitalops/vitalops"><svg class="ic"><use href="#i-git"/></svg><span>GitHub</span></a>
+    <a class="btn btn-p btn-sm" href="docs/"><svg class="ic"><use href="#i-book"/></svg>Docs</a>
+  </div>
 </div></header>
 
 <main>
-<section class="hero"><div class="wrap">
-  <span class="k">Open source · pure Python · MIT</span>
-  <h1>Open-source tools for running LLMs in production.</h1>
-  <p class="lede"><code>vitalops plan</code> works out whether a model fits on a GPU, how fast it will run, how many GPUs it needs and what it will cost. <code>vitalops bench</code> measures a running server and compares it with the plan. No dependencies; Python 3.9 or newer.</p>
-  <div class="install">
-    <div><small>pip</small><pre>pip install vitalops
-vitalops plan Qwen/Qwen3-32B --gpu h100 --users 64
-vitalops bench http://localhost:8000 --plan h100</pre></div>
-    <div><small>one file, no install</small><pre>wget https://github.com/vitalops/vitalops/releases/download/onefile/vitalops.py
-python vitalops.py plan qwen3-32b</pre></div>
-  </div>
-  <a class="pill" href="docs/">Read the docs</a><a class="pill" href="docs/#cli">vitalops plan</a><a class="pill" href="docs/#bench">vitalops bench</a><a class="pill" href="docs/#python-api">Python API</a>
-</div></section>
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="wrap hero-in">
+    <div>
+      <span class="k">Open source · pure Python · MIT</span>
+      <h1>Open-source tools for running LLMs in <em>production</em>.</h1>
+      <p class="lede"><code>vitalops plan</code> works out whether a model fits on a GPU, how fast it will run, how many GPUs it needs and what it will cost. <code>vitalops bench</code> measures a running server and compares it with the plan.</p>
+      <div class="hero-cta">
+        <a class="btn btn-p" href="docs/"><svg class="ic"><use href="#i-book"/></svg>Read the docs</a>
+        <a class="btn btn-g" href="#demo"><svg class="ic"><use href="#i-gauge"/></svg>Try the planner</a>
+      </div>
+      <div class="pip"><span>$</span>pip install vitalops<button class="copy" type="button" data-copy="pip install vitalops" aria-label="Copy the install command"><svg class="ic"><use href="#i-copy"/></svg></button></div>
+    </div>
+    <div class="term" data-tabs>
+      <div class="term-bar">
+        <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="term-tabs" role="tablist" aria-label="Example output">
+          <button type="button" role="tab" aria-selected="true" aria-controls="t-plan" id="tb-plan">plan</button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="t-all" id="tb-all">plan --all-gpus</button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="t-bench" id="tb-bench">bench</button>
+        </div>
+        <span class="term-note" data-note-for="t-bench" hidden>against tests/mock_server.py, not a GPU</span>
+      </div>
+<pre id="t-plan" role="tabpanel" aria-labelledby="tb-plan"><span class="t-c">$</span> <span class="t-cmd">vitalops plan meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64</span>
+<span class="t-h">vitalops plan · Llama-3.3-70B on H100 SXM</span>
+<span class="t-dim">─────────────────────────────────────────</span>
+  <span class="t-p">model</span>      70.6B params · 80 layers · KV 160 KB/token (fp8)
+  <span class="t-p">weights</span>    fp8 65.8 GiB · matmuls at 1,979 TFLOPS fp8
+  <span class="t-p">traffic</span>    64 concurrent requests × (2,048 in + 300 out) · TTFT target 500 ms
 
-<section><div class="wrap">
-  <div class="sec-h"><h2>A report, from one line</h2><p>The shapes come from the Hub or the built-in catalogue; the GPU from the hardware catalogue; everything else is printed, including the assumptions.</p></div>
-<pre class="transcript"><span class="c">$</span> vitalops meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64
-vitalops plan · Llama-3.3-70B on H100 SXM
-─────────────────────────────────────────
-  model      70.6B params · 80 layers · KV 160 KB/token (fp8)
-  weights    fp8 65.8 GiB · matmuls at 1,979 TFLOPS fp8
-  traffic    64 concurrent requests × (2,048 in + 300 out) · TTFT target 500 ms
-
-  layout     TP2 × 1 replica = 2 GPUs · batch 64 per replica (max 218)
-  decode     20.4 tok/s per stream · 1,304 tok/s aggregate · 4.35 requests/s
-  TTFT       155 ms = prefill 135 ms + one step 20.3 ms · target met
-  step       20.3 ms = weights 14.0 ms + KV 4.59 ms + all-reduces 1.65 ms (8%) · memory-bandwidth bound (compute floor 4.57 ms)
-  memory/GPU weights 32.9 GiB · KV 11.5 GiB · runtime 7.90 GiB · free 27.8 GiB of 80.0 GiB
-  cost       $1.07 per 1M output tokens · $3,648 / month at $2.50 per GPU-hour
-
-<span class="c">$</span> vitalops qwen3-32b --all-gpus -q
-vitalops plan · Qwen3-32B · fp8 weights, fp8 KV · 64 × (2,048 in + 300 out) · TTFT target 500 ms
-  GPU             GPUs  TP  tok/s/user  aggregate     TTFT  $/1M out
-  ────────────────────────────────────────────────────────────────────
+  <span class="t-p">layout</span>     <span class="t-h">TP2 × 1 replica = 2 GPUs</span> · batch 64 per replica (max 218)
+  <span class="t-p">decode</span>     <span class="t-h">20.4 tok/s per stream</span> · 1,304 tok/s aggregate · 4.35 requests/s
+  <span class="t-p">TTFT</span>       155 ms = prefill 135 ms + one step 20.3 ms · <span class="t-ok">target met</span>
+  <span class="t-p">step</span>       20.3 ms = weights 14.0 ms + KV 4.59 ms + all-reduces 1.65 ms (8%)
+  <span class="t-p">memory/GPU</span> weights 32.9 GiB · KV 11.5 GiB · runtime 7.90 GiB · free 27.8 GiB
+  <span class="t-p">cost</span>       <span class="t-h">$1.07 per 1M output tokens</span> · $3,648 / month at $2.50 per GPU-hour</pre>
+<pre id="t-all" role="tabpanel" aria-labelledby="tb-all" hidden><span class="t-c">$</span> <span class="t-cmd">vitalops plan qwen3-32b --all-gpus -q</span>
+<span class="t-h">vitalops plan · Qwen3-32B · fp8 weights, fp8 KV · 64 × (2,048 in + 300 out)</span>
+  <span class="t-p">GPU             GPUs  TP  tok/s/user  aggregate     TTFT  $/1M out</span>
+  <span class="t-dim">────────────────────────────────────────────────────────────────────</span>
   H100 SXM           1   1        22.5      1,437   134 ms     $0.48
   H200 SXM           1   1        26.1      1,668   127 ms     $0.58
   B200               1   1        52.2      3,341  58.3 ms     $0.46
   A100 SXM 80 GB     2   2        10.3        659   387 ms     $1.35
   L40S               2   1        10.3        657   370 ms     $0.85
   RTX 5090           2   2        10.7        687   348 ms     $0.57
-  MI300X             1   1        32.1      2,054  98.5 ms     $0.34</pre>
-</div></section>
+  <span class="t-ok">MI300X             1   1        32.1      2,054  98.5 ms     $0.34</span></pre>
+<pre id="t-bench" role="tabpanel" aria-labelledby="tb-bench" hidden><span class="t-c">$</span> <span class="t-cmd">vitalops bench http://localhost:8000 --users 1,8,32 --slo 80 --plan h100</span>
+<span class="t-h">vitalops bench · mock/llama-tiny at http://localhost:8000</span>
+  <span class="t-p">users  requests  req/s  tok/s all  tok/s/user  TTFT p50  TTFT p95  ITL p50</span>
+  <span class="t-dim">───────────────────────────────────────────────────────────────────────────</span>
+      1  16         1.69        216       227.0     33 ms     34 ms   4.4 ms
+         <span class="t-dim">planned    2.34        300       300.1     17 ms             3.2 ms</span>
+      8  16         9.48      1,213       162.4     47 ms     48 ms   6.1 ms
+         <span class="t-dim">planned   14.57      1,865       233.2     17 ms             3.4 ms</span>
+     32  64        15.47      1,980        91.3     95 ms     <span class="t-bad">96 ms</span>  12.1 ms
+         <span class="t-dim">planned   33.04      4,229       132.2     18 ms             4.1 ms</span>
 
-<section id="demo"><div class="wrap">
-  <div class="sec-h"><h2>The planner, interactive</h2><p>Every figure in this panel comes from vitalops's Python source, loaded into <a href="https://pyodide.org">Pyodide</a> (about 7 MB on the first visit). The command that prints the same report is under "Command line". Any public Hugging Face model can be loaded from the model list. <code>vitalops ui</code> serves the same panel from the installed package.</p></div>
-  <div class="lab" data-lab-shell data-tabs="planner" data-gpu="h100"><noscript><p>The demo needs JavaScript.</p></noscript></div>
-  <p class="lab-note">First-order estimates from public specifications, not measurements. Every formula is under "How this is calculated" in the panel.</p>
-</div></section>
+  <span class="t-p">capacity</span>   <span class="t-h">8 concurrent requests</span> meet the 80 ms p95 TTFT target
+  <span class="t-p">gap</span>        At 32 requests TTFT is 5.3× the estimate: requests wait
+             behind other prefills. The planner's TTFT has no queueing.</pre>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><b>0</b><span>dependencies outside the Python standard library</span></div>
+      <div class="stat"><b>Any</b><span>Hugging Face model, read from its config.json; 21 built in for offline use</span></div>
+      <div class="stat"><b>8</b><span>GPUs with datasheet figures, from Jetson AGX Orin to B200 and MI300X</span></div>
+      <div class="stat"><b>1 file</b><span>190 KB, for machines where you would rather not pip install</span></div>
+    </div>
+  </div>
+</section>
 
-<section><div class="wrap">
-  <div class="sec-h"><h2>What it models</h2><p>For a batch of <em>b</em> requests on a tensor-parallel group of <em>tp</em> GPUs.</p></div>
-  <div class="cols">
-    <div class="card"><h3>Memory</h3><p>Weights are parameters × bytes per parameter (bf16 2, fp8 1, int4 0.5625 with group scales), split across the group. The KV cache is 2 × layers × KV heads × head dim × bytes per value per token, or the latent width for models with latent attention; each request reserves prompt + output tokens. 8% of memory plus 1.5 GB is kept for the runtime.</p></div>
-    <div class="card"><h3>Time</h3><p>A decode step is max(memory time, compute time) + all-reduce time: the weights (the experts a batch touches, for a mixture of experts) and the batch's KV cache at 75% of peak bandwidth, against 2 × active parameters × <em>b</em> at 50% of the dense tensor-core rate. Prefill runs at 60% of that rate and is amortised over the batch's output tokens.</p></div>
-    <div class="card"><h3>Layout and cost</h3><p>Tensor parallelism costs two all-reduces per layer over the GPU's link, with 8 µs latency on NVLink or Infinity Fabric and 25 µs on PCIe. For each degree 1, 2, 4, 8 that fits, the KV cache sets the batch per replica and so the replica count; the fewest GPUs that meet the TTFT target win. Cost is GPUs × price per hour ÷ output tokens per hour.</p><p>Not modelled: queueing, speculative decoding, prefix caching, chunked prefill, kernel efficiency at small batches, pipeline or expert parallelism. The <a href="docs/#physics">physics page</a> has every formula.</p></div>
+<section class="sec" id="commands"><div class="wrap">
+  <div class="sec-h"><span class="k">Commands</span><h2>One command for each step of running a model</h2><p class="lede">Size the deployment before you rent anything, check the server once it runs, and check that a cheaper format still gives the same answers. Each command works on its own, and they share one catalogue of models and GPUs.</p></div>
+  <div class="cmds">
+    <a class="cmd" href="#plan">
+      <div class="cmd-art" aria-hidden="true"><svg viewBox="0 0 320 200">
+        <text x="20" y="28" font-size="10" fill="#64748b">$/1M output tokens · Qwen3-32B · 64 users</text>
+        <g font-size="10.5" fill="#cbd5e1">
+          <text x="20" y="62">MI300X</text><rect x="80" y="52" width="75" height="12" rx="3" fill="#637fff"/><text x="163" y="62" fill="#a5b4fc">$0.34</text>
+          <text x="20" y="88">B200</text><rect x="80" y="78" width="101" height="12" rx="3" fill="#3f5cf6" opacity=".75"/><text x="189" y="88">$0.46</text>
+          <text x="20" y="114">H100</text><rect x="80" y="104" width="106" height="12" rx="3" fill="#3f5cf6" opacity=".75"/><text x="194" y="114">$0.48</text>
+          <text x="20" y="140">L40S</text><rect x="80" y="130" width="187" height="12" rx="3" fill="#3f5cf6" opacity=".5"/><text x="275" y="140" text-anchor="end" fill="#fff">$0.85</text>
+          <text x="20" y="166">A100</text><rect x="80" y="156" width="220" height="12" rx="3" fill="#475569"/><text x="294" y="166" text-anchor="end" fill="#fff">$1.35</text>
+        </g>
+      </svg></div>
+      <div class="cmd-b"><div class="cmd-n"><i>01</i><code>vitalops plan</code></div><p>Memory, speed, GPU count and cost for any model on any GPU, from public specifications.</p><span class="more">How it plans<svg class="ic"><use href="#i-arrow"/></svg></span></div>
+    </a>
+    <a class="cmd" href="#bench">
+      <div class="cmd-art" aria-hidden="true"><svg viewBox="0 0 320 200">
+        <text x="20" y="28" font-size="10" fill="#64748b">p95 time to first token against concurrency</text>
+        <line x1="40" y1="170" x2="300" y2="170" stroke="#334155"/><line x1="40" y1="44" x2="40" y2="170" stroke="#334155"/>
+        <line x1="40" y1="96" x2="300" y2="96" stroke="#f87171" stroke-dasharray="4 4"/><text x="46" y="90" font-size="9.5" fill="#fca5a5">TTFT target</text>
+        <path d="M40 158 C110 156 150 150 180 132 S240 70 300 48" fill="none" stroke="#637fff" stroke-width="2.5"/>
+        <path d="M40 162 L300 150" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <circle cx="62" cy="157" r="4" fill="#0b1020" stroke="#a5b4fc" stroke-width="2"/><circle cx="120" cy="153" r="4" fill="#0b1020" stroke="#a5b4fc" stroke-width="2"/><circle cx="180" cy="132" r="4" fill="#0b1020" stroke="#a5b4fc" stroke-width="2"/><circle cx="240" cy="88" r="4" fill="#0b1020" stroke="#f87171" stroke-width="2"/>
+        <line x1="180" y1="132" x2="180" y2="170" stroke="#34d399" stroke-dasharray="2 3"/><text x="184" y="164" font-size="9.5" fill="#34d399">capacity</text>
+        <text x="300" y="186" font-size="9.5" fill="#64748b" text-anchor="end">users</text><text x="52" y="186" font-size="9.5" fill="#64748b">measured ● planned ┄</text>
+      </svg></div>
+      <div class="cmd-b"><div class="cmd-n"><i>02</i><code>vitalops bench</code></div><p>Load any OpenAI-compatible server at several concurrency levels and see where it stops meeting your latency target.</p><span class="more">How it measures<svg class="ic"><use href="#i-arrow"/></svg></span></div>
+    </a>
+    <a class="cmd" href="#demo">
+      <div class="cmd-art" aria-hidden="true"><svg viewBox="0 0 320 200">
+        <rect x="20" y="20" width="280" height="160" rx="8" fill="#111a30" stroke="#1e293b"/>
+        <rect x="32" y="32" width="74" height="136" rx="5" fill="#0b1020"/>
+        <g fill="#334155"><rect x="40" y="44" width="56" height="6" rx="3"/><rect x="40" y="62" width="40" height="5" rx="2.5"/><rect x="40" y="86" width="56" height="4" rx="2"/><rect x="40" y="104" width="56" height="4" rx="2"/><rect x="40" y="122" width="56" height="4" rx="2"/></g>
+        <g fill="#637fff"><rect x="40" y="86" width="34" height="4" rx="2"/><rect x="40" y="104" width="22" height="4" rx="2"/><rect x="40" y="122" width="42" height="4" rx="2"/></g>
+        <g><rect x="116" y="32" width="56" height="34" rx="5" fill="#1e2a4d"/><rect x="178" y="32" width="56" height="34" rx="5" fill="#0b1020"/><rect x="240" y="32" width="50" height="34" rx="5" fill="#0b1020"/>
+        <text x="124" y="46" font-size="8" fill="#64748b">GPUs</text><text x="124" y="60" font-size="12" fill="#a5b4fc">2</text><text x="186" y="46" font-size="8" fill="#64748b">tok/s</text><text x="186" y="60" font-size="12" fill="#e2e8f0">20.4</text><text x="248" y="46" font-size="8" fill="#64748b">$/1M</text><text x="248" y="60" font-size="12" fill="#e2e8f0">1.07</text></g>
+        <rect x="116" y="76" width="174" height="12" rx="3" fill="#3f5cf6"/><rect x="186" y="76" width="22" height="12" fill="#14a89a"/><rect x="208" y="76" width="8" height="12" fill="#f59e0b"/><rect x="216" y="76" width="74" height="12" fill="#8b5cf6"/>
+        <path d="M118 160 C150 156 180 140 210 122 S260 102 288 98" fill="none" stroke="#637fff" stroke-width="2"/><path d="M118 104 C160 110 200 130 288 150" fill="none" stroke="#94a3b8" stroke-dasharray="3 3"/>
+      </svg></div>
+      <div class="cmd-b"><div class="cmd-n"><i>03</i><code>vitalops ui</code></div><p>The planner in a browser, served from the installed package. The same panel runs on this page.</p><span class="more">Open the planner<svg class="ic"><use href="#i-arrow"/></svg></span></div>
+    </a>
+    <a class="cmd soon" href="https://github.com/vitalops/vitalops">
+      <div class="cmd-art" aria-hidden="true"><svg viewBox="0 0 320 200">
+        <text x="20" y="28" font-size="10" fill="#64748b">next-token probabilities</text>
+        <g><rect x="44" y="70" width="22" height="100" rx="3" fill="#3f5cf6"/><rect x="70" y="76" width="22" height="94" rx="3" fill="#14a89a"/>
+        <rect x="110" y="128" width="22" height="42" rx="3" fill="#3f5cf6"/><rect x="136" y="122" width="22" height="48" rx="3" fill="#14a89a"/>
+        <rect x="176" y="148" width="22" height="22" rx="3" fill="#3f5cf6"/><rect x="202" y="146" width="22" height="24" rx="3" fill="#14a89a"/>
+        <rect x="242" y="160" width="22" height="10" rx="3" fill="#3f5cf6"/><rect x="268" y="158" width="22" height="12" rx="3" fill="#14a89a"/></g>
+        <line x1="36" y1="170" x2="300" y2="170" stroke="#334155"/>
+        <g font-size="9.5" fill="#94a3b8"><text x="58" y="186">" the"</text><text x="122" y="186">" a"</text><text x="186" y="186">" its"</text><text x="254" y="186">" one"</text></g>
+        <rect x="20" y="40" width="9" height="9" rx="2" fill="#3f5cf6"/><text x="34" y="48" font-size="9.5" fill="#cbd5e1">bf16</text><rect x="70" y="40" width="9" height="9" rx="2" fill="#14a89a"/><text x="84" y="48" font-size="9.5" fill="#cbd5e1">fp8</text>
+      </svg><span class="badge">In development</span></div>
+      <div class="cmd-b"><div class="cmd-n"><i>04</i><code>vitalops quantcheck</code></div><p>Compare two endpoints token by token, such as bf16 and fp8 builds of one model, to see where quantising changes the output.</p><span class="more">Follow on GitHub<svg class="ic"><use href="#i-up-right"/></svg></span></div>
+    </a>
   </div>
 </div></section>
-<section id="bench"><div class="wrap">
-  <div class="sec-h"><h2>Measure it, next to the plan</h2><p><code>vitalops bench</code> sends concurrent streaming requests to any OpenAI-compatible server (vLLM, SGLang, TGI, llama.cpp, a hosted API) and reports what users see at each concurrency level. With <code>--plan</code>, the planner's estimate for the same traffic sits under each measured row, and large gaps are named.</p></div>
-<pre class="transcript"><span class="c">$</span> vitalops bench http://localhost:8000 --users 1,8,32,64 --prompt 1024 --output 256 --slo 500 --plan h100 --tp 1
-<span class="c">$</span> vitalops bench $ENDPOINT --users 32 --slo 400 --require 32 -q || exit 1     <span class="c"># in CI</span></pre>
-  <div class="cols">
-    <div class="card"><h3>What it reports</h3><p>Per concurrency level: time to first token and time between tokens at p50 and p95, tokens per second per stream and in total, requests per second, and failed requests. The capacity line is the most concurrent requests whose p95 TTFT meets the target.</p></div>
-    <div class="card"><h3>How it measures</h3><p>A closed loop per level, one keep-alive connection per worker, with the first request of each worker discarded as a warm-up. Prompts are random words calibrated to the server's own token counts, distinct per request unless <code>--shared-prefix</code> asks for a common system prompt. Outputs are held to the asked length where the server allows it, and the report says when it does not.</p></div>
-    <div class="card"><h3>Against the plan</h3><p>The plan is one replica on the GPU you name, at the measured concurrency. When TTFT runs far above it, requests are queueing behind other prefills; when a single stream runs far below it, small-batch overheads; when TTFT runs below it with a shared prefix, the prefix cache. The <a href="docs/#bench">bench docs</a> cover the rest.</p></div>
+
+<section class="sec alt" id="plan"><div class="wrap">
+  <div class="feat">
+    <div class="feat-t">
+      <span class="k"><svg class="ic"><use href="#i-gauge"/></svg>vitalops plan</span>
+      <h2>Will it fit, how fast will it run, and what will it cost</h2>
+      <p class="lede">Give it a model and a GPU. It reads the model's shapes from the Hugging Face Hub, takes the GPU from a catalogue of datasheet figures, and finds the fewest GPUs that meet your time-to-first-token target.</p>
+      <ul class="checks">
+        <li><svg class="ic"><use href="#i-check"/></svg><span>Any repository id works, including mixtures of experts and latent attention; gated models read with <code>HF_TOKEN</code>.</span></li>
+        <li><svg class="ic"><use href="#i-check"/></svg><span>Tries tensor parallelism 1, 2, 4 and 8 over the GPU's real link, and as many replicas as the KV cache needs.</span></li>
+        <li><svg class="ic"><use href="#i-check"/></svg><span><code>--all-gpus</code> compares the whole catalogue at once, priced per million output tokens.</span></li>
+        <li><svg class="ic"><use href="#i-check"/></svg><span>Prints every assumption, and exits 1 when the model doesn't fit, so a script can check it.</span></li>
+      </ul>
+      <div class="feat-cta"><a class="btn btn-s" href="docs/#cli">Command reference</a><a class="btn btn-s" href="docs/#python-api">Python API</a></div>
+    </div>
+    <div class="cmp">
+      <div class="cmp-h"><b>Qwen3-32B for 64 concurrent users, by GPU</b><code>vitalops plan qwen3-32b --all-gpus</code></div>
+      <table>
+        <thead><tr><th>GPU</th><th>GPUs</th><th class="hide-s">tok/s per user</th><th class="hide-s">TTFT</th><th>$ per 1M output tokens</th></tr></thead>
+        <tbody>
+          <tr class="best"><td>MI300X</td><td>1</td><td class="hide-s">32.1</td><td class="hide-s">98.5 ms</td><td class="cost"><div class="bar"><i style="width:25%"></i>$0.34</div></td></tr>
+          <tr><td>B200</td><td>1</td><td class="hide-s">52.2</td><td class="hide-s">58.3 ms</td><td class="cost"><div class="bar"><i style="width:34%"></i>$0.46</div></td></tr>
+          <tr><td>H100 SXM</td><td>1</td><td class="hide-s">22.5</td><td class="hide-s">134 ms</td><td class="cost"><div class="bar"><i style="width:36%"></i>$0.48</div></td></tr>
+          <tr><td>RTX 5090</td><td>2</td><td class="hide-s">10.7</td><td class="hide-s">348 ms</td><td class="cost"><div class="bar"><i style="width:42%"></i>$0.57</div></td></tr>
+          <tr><td>H200 SXM</td><td>1</td><td class="hide-s">26.1</td><td class="hide-s">127 ms</td><td class="cost"><div class="bar"><i style="width:43%"></i>$0.58</div></td></tr>
+          <tr><td>L40S</td><td>2</td><td class="hide-s">10.3</td><td class="hide-s">370 ms</td><td class="cost"><div class="bar hi"><i style="width:63%"></i>$0.85</div></td></tr>
+          <tr><td>A100 SXM 80 GB</td><td>2</td><td class="hide-s">10.3</td><td class="hide-s">387 ms</td><td class="cost"><div class="bar hi"><i style="width:100%"></i>$1.35</div></td></tr>
+        </tbody>
+      </table>
+      <div class="cmp-f">fp8 weights and KV cache, 2,048 tokens in and 300 out, at each GPU's default hourly price. Estimates from public specifications, not measurements.</div>
+    </div>
   </div>
+
+  <div class="step" style="margin-top:56px">
+    <div class="step-top"><b>Where one output token's time goes: Llama-3.3-70B, two H100s, 64 users</b><span>49.0 ms per token = 20.4 tok/s per stream</span></div>
+    <div class="step-bar" role="img" aria-label="Weights read 14.0 ms, KV cache read 4.59 ms, all-reduces 1.65 ms, prefill share 28.7 ms">
+      <i style="width:28.6%;background:var(--brand)">weights 14.0 ms</i><i style="width:9.4%;background:var(--kv)">KV 4.6</i><i style="width:3.4%;background:var(--comm)"></i><i style="width:58.6%;background:var(--pre)">prefill share 28.7 ms</i>
+    </div>
+    <div class="step-cols">
+      <div class="step-col" style="--c:var(--brand)"><b>Weights read</b><p>Decode is memory-bound: every step reads the weights, or for a mixture of experts the experts the batch touches.</p><code>weight bytes ÷ (bandwidth × 0.75)</code></div>
+      <div class="step-col" style="--c:var(--kv)"><b>KV cache read</b><p>Each running request's cache is read every step, so it grows with the batch and the context.</p><code>batch × context × KV bytes ÷ (bandwidth × 0.75)</code></div>
+      <div class="step-col" style="--c:var(--comm)"><b>All-reduces</b><p>Tensor parallelism adds two all-reduces per layer over the GPU's link. Cheap on NVLink, expensive on PCIe.</p><code>2 × layers × (bytes ÷ link + latency)</code></div>
+      <div class="step-col" style="--c:var(--pre)"><b>Prefill share</b><p>Prompts are processed between decode steps, so long prompts slow every stream down.</p><code>batch × prefill time ÷ output tokens</code></div>
+    </div>
+    <p class="step-not">Not in the estimate: queueing, prefix caching, speculative decoding, chunked prefill and real kernel efficiency at small batches. <code>vitalops bench</code> measures what those do on your server. <a href="docs/#physics">Every formula</a>.</p>
+  </div>
+</div></section>
+
+<section class="sec" id="demo"><div class="wrap">
+  <div class="sec-h"><span class="k"><svg class="ic"><use href="#i-monitor"/></svg>Live planner</span><h2>The planner, running the Python package in your browser</h2><p class="lede">Every figure in this panel comes from vitalops's Python source, loaded into <a href="https://pyodide.org">Pyodide</a> (about 7 MB on the first visit). Pick a GPU from the photos, change the traffic, or load any public Hugging Face model from the end of the model list. "Command line" shows the command that prints the same report.</p></div>
+  <div class="lab" data-lab-shell data-tabs="planner" data-gpu="h100"><noscript><p>The planner needs JavaScript.</p></noscript></div>
+  <p class="lab-note">First-order estimates from public specifications, not measurements. Every formula is under "How this is calculated" in the panel. <code>vitalops ui</code> serves the same panel from the installed package.</p>
+</div></section>
+
+<section class="sec alt" id="bench"><div class="wrap">
+  <div class="feat rev">
+    <div class="feat-t">
+      <span class="k"><svg class="ic"><use href="#i-activity"/></svg>vitalops bench</span>
+      <h2>Measure the server, at the load you will run it at</h2>
+      <p class="lede">Point it at any OpenAI-compatible endpoint: vLLM, SGLang, TGI, llama.cpp or a hosted API. It runs each concurrency level as a closed loop of streaming requests and reports what users would see.</p>
+      <ul class="checks">
+        <li><svg class="ic"><use href="#i-check"/></svg><span>Time to first token and time between tokens at p50 and p95, tokens per second per stream and in total.</span></li>
+        <li><svg class="ic"><use href="#i-check"/></svg><span>Prompts are sized with the server's own token counts and differ per request, unless <code>--shared-prefix</code> asks for a common system prompt.</span></li>
+        <li><svg class="ic"><use href="#i-check"/></svg><span><code>--plan h100</code> prints the estimate under each measured row and names the likely cause of a large gap.</span></li>
+        <li><svg class="ic"><use href="#i-check"/></svg><span><code>--require 32</code> exits 1 when the target is missed at 32 users, to stop a deploy in CI.</span></li>
+      </ul>
+      <div class="feat-cta"><a class="btn btn-s" href="docs/#bench">How it measures</a></div>
+    </div>
+    <div class="diag">
+      <svg viewBox="0 0 640 344" role="img" aria-label="Timeline of one streamed request, and four workers in a closed loop with their first requests discarded as warm-ups">
+        <text class="lab" x="0" y="16">One request</text>
+        <line x1="20" y1="64" x2="620" y2="64" stroke="#334155"/>
+        <rect x="20" y="52" width="150" height="24" rx="4" fill="#8b5cf6" opacity=".85"/><text x="95" y="68" text-anchor="middle" fill="#fff">queue + prefill</text>
+        <g fill="#7dd3fc"><rect x="170" y="52" width="5" height="24"/><rect x="214" y="52" width="5" height="24"/><rect x="255" y="52" width="5" height="24"/><rect x="299" y="52" width="5" height="24"/><rect x="340" y="52" width="5" height="24"/><rect x="386" y="52" width="5" height="24"/><rect x="428" y="52" width="5" height="24"/><rect x="471" y="52" width="5" height="24"/><rect x="516" y="52" width="5" height="24"/><rect x="558" y="52" width="5" height="24"/><rect x="603" y="52" width="5" height="24"/></g>
+        <path d="M20 90 v6 h152 v-6" fill="none" stroke="#a5b4fc"/><text x="96" y="112" text-anchor="middle" fill="#c7d2fe">time to first token</text>
+        <path d="M216 90 v6 h41 v-6" fill="none" stroke="#7dd3fc"/><text x="236" y="112" text-anchor="middle" fill="#bae6fd">ITL</text>
+        <path d="M172 38 v6 h436 v-6" fill="none" stroke="#34d399"/><text x="390" y="32" text-anchor="middle" fill="#6ee7b7">tokens after the first ÷ this time = tok/s per stream</text>
+        <text x="20" y="46" fill="#64748b">sent</text><text x="620" y="112" text-anchor="end" fill="#64748b">done</text>
+
+        <text class="lab" x="0" y="160">A level of 4 users, closed loop</text>
+        <g font-size="10.5">
+          <text x="0" y="192" fill="#64748b">user 1</text><text x="0" y="222" fill="#64748b">user 2</text><text x="0" y="252" fill="#64748b">user 3</text><text x="0" y="282" fill="#64748b">user 4</text>
+        </g>
+        <g>
+          <rect x="60" y="178" width="120" height="20" rx="4" fill="#334155"/><rect x="184" y="178" width="134" height="20" rx="4" fill="#3f5cf6"/><rect x="322" y="178" width="118" height="20" rx="4" fill="#3f5cf6"/><rect x="444" y="178" width="140" height="20" rx="4" fill="#3f5cf6"/>
+          <rect x="60" y="208" width="140" height="20" rx="4" fill="#334155"/><rect x="204" y="208" width="126" height="20" rx="4" fill="#3f5cf6"/><rect x="334" y="208" width="140" height="20" rx="4" fill="#3f5cf6"/><rect x="478" y="208" width="112" height="20" rx="4" fill="#3f5cf6"/>
+          <rect x="60" y="238" width="128" height="20" rx="4" fill="#334155"/><rect x="192" y="238" width="140" height="20" rx="4" fill="#3f5cf6"/><rect x="336" y="238" width="122" height="20" rx="4" fill="#3f5cf6"/><rect x="462" y="238" width="132" height="20" rx="4" fill="#3f5cf6"/>
+          <rect x="60" y="268" width="134" height="20" rx="4" fill="#334155"/><rect x="198" y="268" width="118" height="20" rx="4" fill="#3f5cf6"/><rect x="320" y="268" width="142" height="20" rx="4" fill="#3f5cf6"/><rect x="466" y="268" width="128" height="20" rx="4" fill="#3f5cf6"/>
+        </g>
+        <text x="120" y="192" text-anchor="middle" fill="#94a3b8">warm-up</text><text x="251" y="192" text-anchor="middle" fill="#fff">measured</text>
+        <text x="60" y="314" fill="#64748b">each user sends its next request as soon as the last one ends;</text>
+        <text x="60" y="330" fill="#64748b">a level measures max(--requests, 2 × users) requests</text>
+      </svg>
+      <div class="diag-legend"><span><i style="background:#8b5cf6"></i>waiting and prefill</span><span><i style="background:#7dd3fc"></i>a streamed token</span><span><i style="background:#334155"></i>warm-up, not counted</span><span><i style="background:#3f5cf6"></i>measured request</span></div>
+    </div>
+  </div>
+  <div class="gaps">
+    <div class="gap" style="--c:#8b5cf6"><small>TTFT far above the plan</small><b>Queueing</b><p>Requests wait behind other prompts' prefill. The plan's TTFT is one prompt on an idle replica, so this gap grows with concurrency.</p></div>
+    <div class="gap" style="--c:#f59e0b"><small>one stream far below the plan</small><b>Small-batch overheads</b><p>At one request, kernel launches and scheduling cost more than the memory reads the plan counts.</p></div>
+    <div class="gap" style="--c:#14a89a"><small>TTFT below the plan, shared prefix</small><b>Prefix cache</b><p>The shared part of the prompt is served from cache instead of being prefilled again, which the plan does not model.</p></div>
+  </div>
+</div></section>
+
+<section class="inst" id="install"><div class="wrap">
+  <div class="sec-h"><span class="k"><svg class="ic"><use href="#i-package"/></svg>Install</span><h2>Python 3.9 or newer, nothing else</h2><p class="lede">No compiled extensions and no dependencies, so it installs anywhere Python runs: a laptop, a CI runner or the GPU box itself.</p></div>
+  <div class="inst-g">
+    <div class="inst-c"><h3><svg class="ic"><use href="#i-package"/></svg>pip</h3><p>The <code>vitalops</code> command and the Python package.</p>
+      <div class="cb"><pre>pip install vitalops
+vitalops plan qwen3-32b --gpu h100</pre><button class="copy" type="button" data-copy="pip install vitalops&#10;vitalops plan qwen3-32b --gpu h100" aria-label="Copy"><svg class="ic"><use href="#i-copy"/></svg></button></div></div>
+    <div class="inst-c"><h3><svg class="ic"><use href="#i-file"/></svg>One file</h3><p>The whole package in a single script, the planner page included.</p>
+      <div class="cb"><pre>wget https://github.com/vitalops/vitalops/releases/download/onefile/vitalops.py
+python vitalops.py plan qwen3-32b</pre><button class="copy" type="button" data-copy="wget https://github.com/vitalops/vitalops/releases/download/onefile/vitalops.py&#10;python vitalops.py plan qwen3-32b" aria-label="Copy"><svg class="ic"><use href="#i-copy"/></svg></button></div></div>
+    <div class="inst-c"><h3><svg class="ic"><use href="#i-bot"/></svg>For coding agents</h3><p>The API and the commands on one page, for an agent's context.</p>
+      <div class="cb"><pre>curl https://vitalops.ai/oss/agent-prompt.txt</pre><button class="copy" type="button" data-copy="curl https://vitalops.ai/oss/agent-prompt.txt" aria-label="Copy"><svg class="ic"><use href="#i-copy"/></svg></button></div></div>
+  </div>
+  <div class="inst-links"><a class="btn btn-p" href="docs/"><svg class="ic"><use href="#i-book"/></svg>Read the docs</a><a class="btn btn-g" href="https://github.com/vitalops/vitalops"><svg class="ic"><use href="#i-git"/></svg>GitHub</a><a class="btn btn-g" href="llms.txt">llms.txt</a></div>
 </div></section>
 </main>
 
-<footer class="foot"><div class="wrap" style="display:contents"><span>MIT licence · <a href="https://github.com/vitalops/vitalops">github.com/vitalops/vitalops</a></span><span>by <a href="https://vitalops.ai">VitalOps</a></span></div></footer>
+<footer class="foot"><div class="wrap">
+  <div class="foot-g">
+    <div><a class="logo" href="https://vitalops.ai/"><svg aria-hidden="true"><use href="#vo-logo"/></svg>VitalOps</a><p>vitalops is built and maintained by VitalOps, which helps teams make inference faster and cheaper on their own hardware.</p></div>
+    <div><h4>Project</h4><a href="https://github.com/vitalops/vitalops">GitHub</a><a href="https://github.com/vitalops/vitalops/releases/tag/onefile">One-file download</a><a href="https://github.com/vitalops/vitalops/issues">Issues</a><a href="https://github.com/vitalops/vitalops/blob/main/LICENSE">MIT licence</a></div>
+    <div><h4>Docs</h4><a href="docs/#introduction">Introduction</a><a href="docs/#cli">vitalops plan</a><a href="docs/#bench">vitalops bench</a><a href="docs/#python-api">Python API</a><a href="docs/#physics">The physics</a></div>
+    <div><h4>VitalOps</h4><a href="https://vitalops.ai/">vitalops.ai</a><a href="https://vitalops.ai/lab/">Live demos</a><a href="https://vitalops.ai/products/plan/">Plan</a><a href="https://vitalops.ai/products/optimize/">Optimize</a></div>
+  </div>
+  <div class="foot-b"><span>MIT licence · © VitalOps Inc</span><span>Estimates come from public specifications and are not measurements.</span></div>
+</div></footer>
 
 <script>window.VO_HW_ROOT = 'https://vitalops.ai/';</script>
+<script src="site.js"></script>
 <script src="hw.js"></script>
 <script src="lab-shell.js"></script>
 <script src="engine.js"></script>
