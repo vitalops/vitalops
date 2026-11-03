@@ -43,7 +43,7 @@ def main() -> None:
         if name == "physics.py":
             src = re.sub(r"^def plan\(", "def plan_scenario(", src, flags=re.M)
         if name == "cli.py":
-            src = src.replace("plan(Scenario(", "plan_scenario(Scenario(")
+            src = re.sub(r"(?<![\w.])plan\(", "plan_scenario(", src)      # the CLI only ever calls the scenario planner
             src = re.sub(r'\nif __name__ == "__main__":\n    sys\.exit\(main\(\)\)\n', "\n", src)
         if name == "__init__.py":
             src = re.sub(r'^__version__ = .*$', "", src, flags=re.M)
