@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tokplan"
+version = "0.1.0"
+description = "Will the model fit, how fast will it run, how many GPUs, what will it cost: a first-order inference planner for any Hugging Face model on any GPU, in pure Python."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "VitalOps" }]
+requires-python = ">=3.9"
+dependencies = []
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+    "License :: OSI Approved :: MIT License",
+]
+
+[project.scripts]
+tokplan = "tokplan.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.urls]
+Homepage = "https://vitalops.github.io/tokplan/"
+Source = "https://github.com/vitalops/tokplan"
+
+[tool.setuptools.packages.find]
+include = ["tokplan*"]
+
+[tool.setuptools.package-data]
+tokplan = ["ui/*"]

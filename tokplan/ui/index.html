@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme:light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tokplan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6fa;--white:#fff;--ink:#0f172a;--ink2:#334155;--ink3:#5b687c;--ink4:#94a3b8;--line:#e2e8f0;--line2:#eef2f7;--brand:#3f5cf6;--brand2:#637fff;--brandD:#2737bd;--brand50:#eff4ff;--brand100:#dbe5ff;--brand200:#bdcdff;--ok:#059669;--warn:#b45309;--bad:#be123c;--font:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;--mono:'DM Mono',ui-monospace,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink2);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 24px 40px}
+header{display:flex;align-items:baseline;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+header h1{font-size:20px;color:var(--ink);letter-spacing:-.02em}
+header p{font-size:13.5px;color:var(--ink3)}
+header code{font-family:var(--mono);font-size:12.5px;background:var(--white);border:1px solid var(--line);border-radius:6px;padding:2px 6px;color:var(--ink)}
+footer{margin-top:14px;font-size:12.5px;color:var(--ink3)}
+footer a{color:var(--brand)}
+@media(max-width:600px){.wrap{padding:14px 12px 30px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>tokplan</h1><p>The same estimate as <code>tokplan MODEL --gpu GPU</code>, interactive. Pick the GPU at the top of the panel.</p></header>
+  <div class="lab" data-lab-shell data-tabs="planner" data-gpu="h100"><noscript><p>This page needs JavaScript.</p></noscript></div>
+  <footer>First-order estimates from public specifications, not measurements. Assumptions are under "How this is calculated". Source and docs: <a href="https://github.com/vitalops/tokplan">github.com/vitalops/tokplan</a> · by <a href="https://vitalops.ai">VitalOps</a>.</footer>
+</div>
+<script>window.VO_HW_ROOT = 'https://vitalops.ai/';</script>
+<script src="hw.js"></script>
+<script src="lab-shell.js"></script>
+<script src="lab-planner.js"></script>
+</body>
+</html>
