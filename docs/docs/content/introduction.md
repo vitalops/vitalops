@@ -1,11 +1,16 @@
 # Introduction
 
-tokplan answers four questions about running an open-weight model: will it fit, how fast will it run, how many GPUs does it take, and what will it cost. It is a command-line tool and a Python library, pure Python with no dependencies, for Python 3.9 or newer.
+vitalops is a set of command-line tools and a Python library for running open-weight language models, pure Python with no dependencies, for Python 3.9 or newer:
+
+- `vitalops plan` answers four questions before you deploy: will the model fit, how fast will it run, how many GPUs does it take, and what will it cost.
+- `vitalops bench` measures the server once it runs, at the concurrency you care about, and puts the plan's estimate next to each measurement.
+
+This page is about `plan`; [vitalops bench](#bench) has its own.
 
 ```
-$ tokplan Qwen/Qwen3-32B --gpu h100 --users 64
-tokplan · Qwen3-32B on H100 SXM
-───────────────────────────────
+$ vitalops plan Qwen/Qwen3-32B --gpu h100 --users 64
+vitalops plan · Qwen3-32B on H100 SXM
+─────────────────────────────────────
   model      32.8B params · 64 layers · KV 128 KB/token (fp8)
   weights    fp8 30.5 GiB · matmuls at 1,979 TFLOPS fp8
   traffic    64 concurrent requests × (2,048 in + 300 out) · TTFT target 500 ms
@@ -28,11 +33,12 @@ tokplan · Qwen3-32B on H100 SXM
 
 ## What it is not
 
-The figures are estimates for planning. They come from public specifications and a handful of stated efficiency assumptions, and they leave out queueing, speculative decoding, prefix caching, chunked prefill and the efficiency of real kernels at small batch sizes. A measured number on your hardware typically differs by tens of percent, not by multiples; [the physics page](#physics) says how to compare the two.
+The figures are estimates for planning. They come from public specifications and a handful of stated efficiency assumptions, and they leave out queueing, speculative decoding, prefix caching, chunked prefill and the efficiency of real kernels at small batch sizes. A measured number on your hardware typically differs by tens of percent, not by multiples; [vitalops bench](#bench) measures it and prints the two side by side.
 
 ## Where to go next
 
 - [Install](#install) and run it.
-- [Command line](#cli): every flag, the exit codes, the JSON output.
-- [Python API](#python-api): `tokplan.plan`, `tokplan.fit`, the `Plan` dataclass.
-- [The interactive planner](#ui): the same estimate in a browser, with `tokplan ui` or on [vitalops.ai](https://vitalops.ai/lab/).
+- [vitalops plan](#cli): every flag, the exit codes, the JSON output.
+- [vitalops bench](#bench): measuring an endpoint, and comparing it with the plan.
+- [Python API](#python-api): `vitalops.plan`, `vitalops.fit`, the `Plan` dataclass, `vitalops.bench.bench`.
+- [vitalops ui](#ui): the planner in a browser, locally or on [this site](../#demo).

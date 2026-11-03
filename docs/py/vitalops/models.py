@@ -16,7 +16,7 @@ from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Optional
 
 HUB = "https://huggingface.co"
-CACHE_DIR = os.path.join(os.path.expanduser("~"), ".cache", "tokplan")
+CACHE_DIR = os.path.join(os.path.expanduser("~"), ".cache", "vitalops")
 CACHE_TTL = 7 * 86400
 _DTYPE_BYTES = {"bfloat16": 2, "float16": 2, "float32": 4, "float8_e4m3fn": 1, "float8_e5m2": 1}
 
@@ -99,7 +99,7 @@ def catalogue() -> List[Model]:
 
 # ---------------------------------------------------------------- Hugging Face Hub
 def _get(url: str, timeout: float = 20.0, head: bool = False):
-    req = urllib.request.Request(url, method="HEAD" if head else "GET", headers={"User-Agent": "tokplan/0.1"})
+    req = urllib.request.Request(url, method="HEAD" if head else "GET", headers={"User-Agent": "vitalops/0.1"})
     tok = os.environ.get("HF_TOKEN")
     if tok:
         req.add_header("Authorization", "Bearer " + tok)

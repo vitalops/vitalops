@@ -1,9 +1,9 @@
 # Python API
 
 ```python
-import tokplan
+import vitalops
 
-p = tokplan.plan("Qwen/Qwen3-235B-A22B", gpu="h200", weights="fp8", users=128, prompt=4096, output=512)
+p = vitalops.plan("Qwen/Qwen3-235B-A22B", gpu="h200", weights="fp8", users=128, prompt=4096, output=512)
 if p.fits:
     print(p.layout.gpus, "GPUs at TP", p.layout.tp)
     print(round(p.user_tps, 1), "tok/s per stream,", round(p.ttft_ms), "ms TTFT")
@@ -14,7 +14,7 @@ else:
 
 Everything the command line prints comes from these functions and dataclasses.
 
-## `tokplan.plan(model, gpu="h100", **kw) -> Plan`
+## `vitalops.plan(model, gpu="h100", **kw) -> Plan`
 
 Plans a deployment. `model` is a catalogue name, a Hugging Face repository id, or a `Model`; `gpu` is a catalogue key or a `GPU`. Keyword arguments, with the command-line defaults:
 
@@ -32,7 +32,7 @@ Plans a deployment. `model` is a catalogue name, a Hugging Face repository id, o
 
 Raises `LookupError` for an unknown name, a gated repository without `HF_TOKEN`, or a config this planner does not understand; network errors from `urllib` propagate.
 
-## `tokplan.fit(model, gpu="h100", **kw) -> bool`
+## `vitalops.fit(model, gpu="h100", **kw) -> bool`
 
 `plan(...).fits`: whether the model, with one request's KV cache, fits a tensor-parallel group of up to eight of this GPU.
 
@@ -86,10 +86,10 @@ One operating point: a batch on a tensor-parallel group. All times in seconds.
 | `agg_tps` | `user_tps × batch`, for this replica |
 | `memory_bound` | whether the memory time exceeds the compute time |
 
-`tokplan.perf(scenario, tp, batch)` evaluates one point directly:
+`vitalops.perf(scenario, tp, batch)` evaluates one point directly:
 
 ```python
-from tokplan import Scenario, perf, load_model, get_gpu
+from vitalops import Scenario, perf, load_model, get_gpu
 
 s = Scenario(model=load_model("llama-70b"), gpu=get_gpu("h100"), weights="fp8", kv="fp8", users=64, prompt=2048, output=300)
 for b in (1, 8, 64, 256):
@@ -104,12 +104,12 @@ The input dataclass: `model`, `gpu`, `weights`, `kv`, `users`, `prompt`, `output
 ## The catalogues
 
 ```python
-tokplan.load_model("qwen3-32b")                 # catalogue name
-tokplan.load_model("Qwen/Qwen2.5-14B-Instruct")  # the Hub, cached for a week
-tokplan.from_hub("Qwen/Qwen2.5-14B-Instruct", revision="main")
-tokplan.catalogue()                              # list of Model
-tokplan.get_gpu("h100")                          # GPU
-tokplan.GPUS                                     # dict of key -> GPU
+vitalops.load_model("qwen3-32b")                 # catalogue name
+vitalops.load_model("Qwen/Qwen2.5-14B-Instruct")  # the Hub, cached for a week
+vitalops.from_hub("Qwen/Qwen2.5-14B-Instruct", revision="main")
+vitalops.catalogue()                              # list of Model
+vitalops.get_gpu("h100")                          # GPU
+vitalops.GPUS                                     # dict of key -> GPU
 ```
 
 `Model` has `id`, `name`, `total`, `active`, `layers`, `kv_heads`, `head_dim`, `hidden`, `kv_per_layer`, `experts`, `top_k`, `source` and `note`, plus `moe` (whether `active < total`), `kv_width()` and `kv_bytes_per_token(kv_bytes)`. `GPU` has `key`, `name`, `vendor`, `arch`, `sms`, `mem`, `mem_type`, `stacks`, `stack_gb`, `bw`, `flops`, `link_name`, `link_gbps`, `tdp`, `price`, `latency_ns`, `note`, plus `pcie` and `rate(weights)`.
@@ -117,9 +117,26 @@ tokplan.GPUS                                     # dict of key -> GPU
 Both dataclasses are plain Python: a `Model` or `GPU` you construct yourself is accepted anywhere a name is, which is how to plan for hardware or a model not in the catalogues.
 
 ```python
-from tokplan import Model, GPU, plan
+from vitalops import Model, GPU, plan
 
 my_gpu = GPU(key="x", name="My accelerator", vendor="x", arch="x", sms=100, mem=96, mem_type="HBM3", stacks=6, stack_gb=16,
              bw=4.0, flops={"bf16": 1000, "fp8": 2000}, link_name="NVLink", link_gbps=400, tdp=700, price=3.0)
 print(plan("qwen3-32b", my_gpu, offline=True).user_tps)
 ```
+
+## `vitalops.bench.bench(url, **kw) -> Run`
+
+Measures an OpenAI-compatible endpoint; the Python side of [vitalops bench](#bench).
+
+```python
+from vitalops.bench import bench
+
+run = bench("http://localhost:8000", users=(1, 8, 32), prompt=1024, output=128, slo_ms=400,
+            plan_gpu="h100", tp=1, scenario_kw={"weights": "fp8", "kv": "fp8"})
+run.capacity                  # the most tested concurrency whose p95 TTFT met slo_ms, or None
+for lv in run.levels:         # one Level per concurrency
+    lv.ttft_ms_p95, lv.itl_ms_p50, lv.output_tps, lv.user_tps, lv.predicted
+run.to_dict()                 # the JSON the command prints
+```
+
+Keyword arguments: `users`, `prompt`, `output`, `shared_prefix`, `requests`, `slo_ms`, `model`, `api` (`"completions"` or `"chat"`), `api_key` (default `OPENAI_API_KEY`), `seed`, `plan_gpu`, `plan_model`, `tp`, `scenario_kw`, `progress` (a function that takes a status line). It raises `vitalops.bench.BenchError` when the server cannot be reached or accepts no request; failed requests during a run are counted in `Level.errors`.

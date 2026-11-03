@@ -4,7 +4,7 @@ The planner needs a few shapes from a model: how many parameters it has (and how
 
 ## The built-in catalogue
 
-`tokplan models` lists it. These need no network and are the names `--offline` accepts; the id, the name and the short aliases (`llama-70b`, `qwen3-32b`, `deepseek-v3`, …) all work.
+`vitalops models` lists it. These need no network and are the names `--offline` accepts; the id, the name and the short aliases (`llama-70b`, `qwen3-32b`, `deepseek-v3`, …) all work.
 
 | Id | Name | Parameters | Layers · KV heads × head dim |
 |---|---|---|---|
@@ -30,7 +30,7 @@ The planner needs a few shapes from a model: how many parameters it has (and how
 | `openai/gpt-oss-20b` | gpt-oss-20b (MoE) | 20.9B, 3.6B active | 24 · 8 × 64 |
 | `openai/gpt-oss-120b` | gpt-oss-120b (MoE) | 117B, 5.1B active | 36 · 8 × 64 |
 
-Parameter counts are from the published checkpoints or model cards; shapes from each repository's `config.json`. The catalogue is plain Python in `tokplan/models.py`.
+Parameter counts are from the published checkpoints or model cards; shapes from each repository's `config.json`. The catalogue is plain Python in `vitalops/models.py`.
 
 ## Any repository on the Hub
 
@@ -40,12 +40,12 @@ A repository id that is not in the catalogue is read from the Hub:
 2. `model.safetensors.index.json` gives the checkpoint's total bytes; divided by the bytes per value of `torch_dtype`, that is the exact parameter count. A single-file checkpoint is sized with a HEAD request on `model.safetensors` instead. A quantised checkpoint (one with `quantization_config`) is not sized this way, because its bytes do not reflect its parameters; the shapes are used.
 3. When the checkpoint size and the shapes disagree by more than a third, the shapes win and the report carries a note.
 
-Fetched data is cached for a week under `~/.cache/tokplan`. Gated repositories need `HF_TOKEN`. `--offline` disables all of this.
+Fetched data is cached for a week under `~/.cache/vitalops`. Gated repositories need `HF_TOKEN`. `--offline` disables all of this.
 
 ```
-$ tokplan Qwen/Qwen2.5-14B-Instruct --users 8 -q
-tokplan · Qwen2.5-14B-Instruct on H100 SXM
-──────────────────────────────────────────
+$ vitalops plan Qwen/Qwen2.5-14B-Instruct --users 8 -q
+vitalops plan · Qwen2.5-14B-Instruct on H100 SXM
+────────────────────────────────────────────────
   model      14.8B params [hub] · 48 layers · KV 96 KB/token (fp8)
   ...
 ```

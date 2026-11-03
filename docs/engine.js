@@ -1,7 +1,7 @@
-/* The planner's engine on tokplan's site: tokplan's own Python source (py/tokplan/, a copy of the
+/* The planner's engine on vitalops's site: vitalops's own Python source (py/vitalops/, a copy of the
    package that tools/site.py keeps in sync) loaded into Pyodide. lab-planner.js calls
-   tokplan.web.evaluate for every figure it shows. Pyodide has no sockets, so a Hugging Face config is
-   fetched here and handed to tokplan's loader through its cache. */
+   vitalops.web.evaluate for every figure it shows. Pyodide has no sockets, so a Hugging Face config is
+   fetched here and handed to vitalops's loader through its cache. */
 (function () {
   'use strict';
   var PYODIDE = 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/';
@@ -22,8 +22,8 @@
   }
 
   var E = {
-    label: 'tokplan · Python',
-    tip: 'Every figure here comes from tokplan\'s Python source, loaded into Pyodide (CPython compiled to WebAssembly), the same code pip installs. The command line below prints the same report.',
+    label: 'vitalops · Python',
+    tip: 'Every figure here comes from vitalops\'s Python source, loaded into Pyodide (CPython compiled to WebAssembly), the same code pip installs. The command line below prints the same report.',
     models: [],
     version: '',
     onStatus: function (f) { listeners.push(f); if (last) f(last); }
@@ -31,23 +31,23 @@
 
   E.ready = (async function () {
     status('Loading Pyodide, CPython compiled to WebAssembly (about 7 MB, cached after the first visit)…');
-    var files = Promise.all(FILES.map(function (f) { return text('py/tokplan/' + f); }));
+    var files = Promise.all(FILES.map(function (f) { return text('py/vitalops/' + f); }));
     await script(PYODIDE + 'pyodide.js');
     py = await window.loadPyodide({ indexURL: PYODIDE });
-    status('Loading tokplan…');
+    status('Loading vitalops…');
     var srcs = await files;
-    py.FS.mkdirTree('/home/pyodide/tokplan');
-    FILES.forEach(function (f, i) { py.FS.writeFile('/home/pyodide/tokplan/' + f, srcs[i]); });
+    py.FS.mkdirTree('/home/pyodide/vitalops');
+    FILES.forEach(function (f, i) { py.FS.writeFile('/home/pyodide/vitalops/' + f, srcs[i]); });
     py.runPython("import sys; sys.path.insert(0, '/home/pyodide')");
-    web = py.pyimport('tokplan.web');
+    web = py.pyimport('vitalops.web');
     var d = JSON.parse(web.model_list_json());
     E.models = d.models; E.version = d.version;
-    E.label = 'tokplan ' + d.version + ' · Python';
+    E.label = 'vitalops ' + d.version + ' · Python';
   })();
 
   E.evaluate = function (state) { return JSON.parse(web.evaluate_json(JSON.stringify(state))); };
 
-  // config.json and the checkpoint size, as tokplan.models.fetch_hub reads them, then tokplan's own loader
+  // config.json and the checkpoint size, as vitalops.models.fetch_hub reads them, then vitalops's own loader
   E.loadModel = async function (repo) {
     var base = HUB + repo + '/resolve/main/';
     var r = await fetch(base + 'config.json');

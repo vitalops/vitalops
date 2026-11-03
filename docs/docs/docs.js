@@ -1,4 +1,4 @@
-// tokplan docs: Markdown pages under content/, ordered by nav.json, rendered here. Routes are #<page> or #<page>/<heading>.
+// vitalops docs: Markdown pages under content/, ordered by nav.json, rendered here. Routes are #<page> or #<page>/<heading>.
 (function () {
   'use strict';
   var side = document.getElementById('side'), doc = document.getElementById('doc'), pager = document.getElementById('pager'), menu = document.getElementById('menu');
@@ -107,7 +107,7 @@
     fetchPage(slug).then(function (md) {
       var r = render(md);
       doc.innerHTML = r.html;
-      document.title = bySlug[slug][1] + ' · tokplan docs';
+      document.title = bySlug[slug][1] + ' · vitalops docs';
       var k = pages.findIndex(function (p) { return p[0] === slug; }), prev = pages[k - 1], next = pages[k + 1];
       pager.innerHTML = (prev ? '<a href="#' + prev[0] + '"><small>Previous</small>' + prev[1] + '</a>' : '<span></span>') + (next ? '<a class="next" href="#' + next[0] + '"><small>Next</small>' + next[1] + '</a>' : '');
       if (anchor) { var el = document.getElementById(anchor); if (el) el.scrollIntoView(); } else window.scrollTo(0, 0);

@@ -1,15 +1,15 @@
 # Command line
 
 ```
-tokplan MODEL [options]           plan a deployment (the default command)
-tokplan plan MODEL [options]      the same, spelled out
-tokplan gpus [--json]             the GPU catalogue
-tokplan models [--json]           the built-in model catalogue
-tokplan ui [--port N] [--no-browser]   the interactive planner, served locally
-tokplan --version
+vitalops plan MODEL [options]           plan a deployment (the default command)
+vitalops plan MODEL [options]      the same, spelled out
+vitalops gpus [--json]             the GPU catalogue
+vitalops models [--json]           the built-in model catalogue
+vitalops ui [--port N] [--no-browser]   the interactive planner, served locally
+vitalops --version
 ```
 
-`MODEL` is a Hugging Face repository id such as `Qwen/Qwen3-32B` or `meta-llama/Llama-3.3-70B-Instruct`, or a catalogue name such as `llama-70b`, `qwen3-32b`, `deepseek-v3`. Names are case-insensitive. `tokplan models` lists the catalogue.
+`MODEL` is a Hugging Face repository id such as `Qwen/Qwen3-32B` or `meta-llama/Llama-3.3-70B-Instruct`, or a catalogue name such as `llama-70b`, `qwen3-32b`, `deepseek-v3`. Names are case-insensitive. `vitalops models` lists the catalogue.
 
 ## Options
 
@@ -33,9 +33,9 @@ tokplan --version
 ## The report
 
 ```
-$ tokplan meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64
-tokplan · Llama-3.3-70B on H100 SXM
-───────────────────────────────────
+$ vitalops plan meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64
+vitalops plan · Llama-3.3-70B on H100 SXM
+─────────────────────────────────────────
   model      70.6B params · 80 layers · KV 160 KB/token (fp8)
   weights    fp8 65.8 GiB · matmuls at 1,979 TFLOPS fp8
   traffic    64 concurrent requests × (2,048 in + 300 out) · TTFT target 500 ms
@@ -68,9 +68,9 @@ Line by line:
 When the model does not fit a tensor-parallel group of up to eight GPUs the report says so and why:
 
 ```
-$ tokplan deepseek-v3 --gpu h100 -q
-tokplan · DeepSeek-V3 (MoE, MLA) on H100 SXM
-────────────────────────────────────────────
+$ vitalops plan deepseek-v3 --gpu h100 -q
+vitalops plan · DeepSeek-V3 (MoE, MLA) on H100 SXM
+──────────────────────────────────────────────────
   model      671.0B (37.0B active) params · 61 layers · KV 34 KB/token (fp8)
   weights    fp8 625 GiB · matmuls at 1,979 TFLOPS fp8
   traffic    64 concurrent requests × (2,048 in + 300 out) · TTFT target 500 ms
@@ -81,8 +81,8 @@ tokplan · DeepSeek-V3 (MoE, MLA) on H100 SXM
 ## Comparing GPUs
 
 ```
-$ tokplan qwen3-32b --all-gpus -q
-tokplan · Qwen3-32B · fp8 weights, fp8 KV · 64 × (2,048 in + 300 out) · TTFT target 500 ms
+$ vitalops plan qwen3-32b --all-gpus -q
+vitalops plan · Qwen3-32B · fp8 weights, fp8 KV · 64 × (2,048 in + 300 out) · TTFT target 500 ms
   GPU             GPUs  TP  tok/s/user  aggregate     TTFT  $/1M out
   ────────────────────────────────────────────────────────────────────
   H100 SXM           1   1        22.5      1,437   134 ms     $0.48
@@ -107,7 +107,7 @@ The last column is blank when the layout meets the TTFT target, and says `misses
 That makes a plan usable as a check in a script or in CI:
 
 ```
-tokplan Qwen/Qwen3-32B --gpu l40s --users 32 --slo 400 -q || echo "needs a different layout"
+vitalops plan Qwen/Qwen3-32B --gpu l40s --users 32 --slo 400 -q || echo "needs a different layout"
 ```
 
 ## JSON
@@ -115,7 +115,7 @@ tokplan Qwen/Qwen3-32B --gpu l40s --users 32 --slo 400 -q || echo "needs a diffe
 `--json` prints the whole `Plan` as JSON, with the model's shapes under `model_shapes`. Times are in seconds, sizes in bytes.
 
 ```
-$ tokplan qwen3-32b --json
+$ vitalops plan qwen3-32b --json
 {
   "fits": true,
   "model": "Qwen3-32B",
@@ -158,14 +158,14 @@ $ tokplan qwen3-32b --json
 }
 ```
 
-With `--all-gpus --json` the output is an object keyed by GPU, each value a `Plan`. `tokplan gpus --json` and `tokplan models --json` dump the catalogues.
+With `--all-gpus --json` the output is an object keyed by GPU, each value a `Plan`. `vitalops gpus --json` and `vitalops models --json` dump the catalogues.
 
 ## The Hub
 
-A repository id that is not in the catalogue is read from the Hub: `config.json` for the shapes, and `model.safetensors.index.json` (or the size of `model.safetensors`) for the exact parameter count. Fetched configs are cached for a week under `~/.cache/tokplan`. Gated repositories need `HF_TOKEN`:
+A repository id that is not in the catalogue is read from the Hub: `config.json` for the shapes, and `model.safetensors.index.json` (or the size of `model.safetensors`) for the exact parameter count. Fetched configs are cached for a week under `~/.cache/vitalops`. Gated repositories need `HF_TOKEN`:
 
 ```
-HF_TOKEN=hf_... tokplan meta-llama/Meta-Llama-3-8B-Instruct
+HF_TOKEN=hf_... vitalops meta-llama/Meta-Llama-3-8B-Instruct
 ```
 
 Without a token the command exits with code 2 and says the repository is gated. [Models](#models) describes what is read and how it is interpreted.

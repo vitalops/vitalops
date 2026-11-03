@@ -1,5 +1,5 @@
 """The bridge the interactive planner calls: the docs site loads this package into Pyodide and calls
-it directly; `tokplan ui` calls it over HTTP on localhost. State in, plain dicts (or JSON) out.
+it directly; `vitalops ui` calls it over HTTP on localhost. State in, plain dicts (or JSON) out.
 """
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ def preload(repo: str, config: dict, total_bytes: Optional[int] = None) -> None:
 
 def command(st: dict) -> str:
     """The command line that prints the same report."""
-    parts = ["tokplan", st["model"], "--gpu", st["gpu"]]
+    parts = ["vitalops", "plan", st["model"], "--gpu", st["gpu"]]
     for k in ("weights", "kv", "users", "prompt", "output", "slo"):
         v = st.get(k, DEFAULTS[k])
         if v != DEFAULTS[k]:

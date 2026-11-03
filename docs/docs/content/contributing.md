@@ -1,17 +1,17 @@
 # Contributing
 
-The repository is [github.com/vitalops/tokplan](https://github.com/vitalops/tokplan), MIT licensed. Corrections to a catalogue figure, new hardware, new models and fixes to the model of inference are welcome as pull requests.
+The repository is [github.com/vitalops/vitalops](https://github.com/vitalops/vitalops), MIT licensed. Corrections to a catalogue figure, new hardware, new models and fixes to the model of inference are welcome as pull requests.
 
 ## Layout
 
 | Path | What it is |
 |---|---|
-| `tokplan/hw.py` | the GPU catalogue and the `GPU` dataclass |
-| `tokplan/models.py` | the model catalogue, the Hub loader, the `Model` dataclass |
-| `tokplan/physics.py` | the model of inference: `Scenario`, `perf`, `plan`, the constants |
-| `tokplan/cli.py` | the command line |
-| `tokplan/web.py` | what the interactive page calls: `evaluate(state)` returns the plan, the report and the chart |
-| `tokplan/ui.py`, `tokplan/ui/` | `tokplan ui`: a local server with a JSON API over `web.py`, and the page it serves |
+| `vitalops/hw.py` | the GPU catalogue and the `GPU` dataclass |
+| `vitalops/models.py` | the model catalogue, the Hub loader, the `Model` dataclass |
+| `vitalops/physics.py` | the model of inference: `Scenario`, `perf`, `plan`, the constants |
+| `vitalops/cli.py` | the command line |
+| `vitalops/web.py` | what the interactive page calls: `evaluate(state)` returns the plan, the report and the chart |
+| `vitalops/ui.py`, `vitalops/ui/` | `vitalops ui`: a local server with a JSON API over `web.py`, and the page it serves |
 | `tests/` | pytest |
 | `tools/onefile.py` | the single-file build |
 | `tools/site.py` | copies the package into `docs/py/` and the page's scripts into `docs/`; run it after a change |
@@ -20,7 +20,7 @@ The repository is [github.com/vitalops/tokplan](https://github.com/vitalops/tokp
 ## Running the tests
 
 ```
-git clone https://github.com/vitalops/tokplan && cd tokplan
+git clone https://github.com/vitalops/vitalops && cd vitalops
 pip install -e .[dev]
 pytest
 ```
@@ -29,7 +29,7 @@ The tests cover the physics against the website's figures, the layout search, th
 
 ## Adding a GPU
 
-Add an entry to `GPUS` in `tokplan/hw.py`:
+Add an entry to `GPUS` in `vitalops/hw.py`:
 
 ```python
 "h100": _g(key="h100", name="H100 SXM", vendor="nvidia", arch="sm_90", sms=132, mem=80, mem_type="HBM3", stacks=5, stack_gb=16, bw=3.35,
@@ -40,7 +40,7 @@ Every figure except `price` and `latency_ns` must come from the vendor's datashe
 
 ## Adding a model
 
-Add an entry to `CATALOGUE` in `tokplan/models.py`:
+Add an entry to `CATALOGUE` in `vitalops/models.py`:
 
 ```python
 _m("Qwen/Qwen3-32B", "Qwen3-32B", 32.8e9, 32.8e9, 64, 8, 128, 5120),
@@ -51,16 +51,16 @@ The arguments are id, name, total parameters, active parameters, layers, KV head
 
 ## Changing the physics
 
-The constants are at the top of `tokplan/physics.py`. A change to them or to a formula should come with the measurement that motivates it, and the tests that pin the website's figures will need the same change in the JavaScript port in `lab-planner.js` that vitalops.ai uses. This site and `tokplan ui` call the package itself, so they follow automatically; run `python tools/site.py` to refresh `docs/py/`.
+The constants are at the top of `vitalops/physics.py`. A change to them or to a formula should come with the measurement that motivates it, and the tests that pin the website's figures will need the same change in the JavaScript port in `lab-planner.js` that vitalops.ai uses. This site and `vitalops ui` call the package itself, so they follow automatically; run `python tools/site.py` to refresh `docs/py/`.
 
 ## The single-file build
 
 ```
 python tools/onefile.py
-python dist/tokplan.py qwen3-32b --offline
+python dist/vitalops.py qwen3-32b --offline
 ```
 
-`tools/onefile.py` concatenates the modules in dependency order, strips the relative imports and embeds the UI page, and writes `dist/tokplan.py`. CI runs it on every push; a release attaches it as `tokplan.py`.
+`tools/onefile.py` concatenates the modules in dependency order, strips the relative imports and embeds the UI page, and writes `dist/vitalops.py`. CI runs it on every push; a release attaches it as `vitalops.py`.
 
 ## Style
 

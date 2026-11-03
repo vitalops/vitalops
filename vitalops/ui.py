@@ -1,6 +1,6 @@
-"""`tokplan ui`: the interactive planner from vitalops.ai, served from this package on localhost.
+"""`vitalops ui`: the interactive planner from vitalops.ai, served from this package on localhost.
 
-The page calls back into this package for every figure (tokplan.web over a small JSON API), so it
+The page calls back into this package for every figure (vitalops.web over a small JSON API), so it
 shows exactly what the command line prints, and models from the Hub load with your HF_TOKEN.
 Hardware photographs are loaded from vitalops.ai when there is a connection and left out otherwise.
 """
@@ -64,10 +64,10 @@ def serve(port: int = 8765, no_browser: bool = False) -> int:
     try:
         httpd = socketserver.TCPServer(("127.0.0.1", port), _Quiet)
     except OSError as e:
-        print("tokplan: cannot listen on port %d (%s); try --port" % (port, e), file=sys.stderr)
+        print("vitalops: cannot listen on port %d (%s); try --port" % (port, e), file=sys.stderr)
         return 2
     url = "http://127.0.0.1:%d/" % port
-    print("tokplan ui at %s  (Ctrl-C to stop)" % url)
+    print("vitalops ui at %s  (Ctrl-C to stop)" % url)
     if not no_browser:
         threading.Timer(0.4, lambda: webbrowser.open(url)).start()
     try:

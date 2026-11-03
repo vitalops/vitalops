@@ -1,6 +1,6 @@
 # The physics
 
-tokplan is a first-order model of transformer inference. This page is the whole of it: the formulas, the constants, what is left out, and how to compare an estimate with a measurement. The code is `tokplan/physics.py`, about 150 lines.
+vitalops plan is a first-order model of transformer inference. This page is the whole of it: the formulas, the constants, what is left out, and how to compare an estimate with a measurement. The code is `vitalops/physics.py`, about 150 lines.
 
 Throughout: `b` is the batch (requests on one replica), `tp` the tensor-parallel degree (GPUs in one replica), `P` the prompt tokens and `O` the output tokens per request.
 
@@ -103,7 +103,7 @@ cost_per_month     = gpus × price_per_hour × 24 × 30.4
 | Batch cap | 512 | serving engines' usual maximum concurrency |
 | int4 bytes per parameter | 0.5625 | 4 bits + fp16 scale per group of 128 |
 
-They live at the top of `tokplan/physics.py`. Change them there, or build a `Scenario` and call `perf` with your own, when you have measurements to calibrate against.
+They live at the top of `vitalops/physics.py`. Change them there, or build a `Scenario` and call `perf` with your own, when you have measurements to calibrate against.
 
 ## Not modelled
 
@@ -125,4 +125,4 @@ Run the model on the hardware with a load generator at the scenario's concurrenc
 - **TTFT at low load** against `ttft_ms`. A gap here is prefill efficiency, or chunked prefill in the engine.
 - **The fit**: if the engine refuses the concurrency the plan claims, the runtime reserve is too small for that engine and model; raise it.
 
-`tokplan MODEL --json` gives every intermediate figure, so a comparison can be scripted. The constants are the only knobs; the shapes and the datasheet figures are facts.
+`vitalops plan MODEL --json` gives every intermediate figure, so a comparison can be scripted. The constants are the only knobs; the shapes and the datasheet figures are facts.

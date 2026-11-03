@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light">
-<title>tokplan · will the model fit, how fast, how many GPUs, what will it cost</title>
-<meta name="description" content="tokplan is a first-order inference planner for any Hugging Face model on any GPU, in pure Python: memory, tokens per second, time to first token, tensor-parallel layout and cost per million tokens.">
-<link rel="canonical" href="https://vitalops.ai/tokplan/">
+<title>vitalops · plan an LLM deployment, then measure it</title>
+<meta name="description" content="vitalops is open-source tooling for LLM inference in pure Python. vitalops plan estimates memory, tokens per second, time to first token, tensor-parallel layout and cost for any Hugging Face model on any GPU; vitalops bench measures an OpenAI-compatible endpoint against that plan.">
+<link rel="canonical" href="https://vitalops.ai/oss/">
 <meta name="theme-color" content="#f5f6fa">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233f5cf6'/%3E%3Cpath d='M8 11h16M16 11v12' stroke='%23fff' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E">
 <meta property="og:type" content="website">
-<meta property="og:title" content="tokplan">
-<meta property="og:description" content="Will the model fit, how fast will it run, how many GPUs, what will it cost. A first-order inference planner in pure Python.">
-<meta property="og:url" content="https://vitalops.ai/tokplan/">
+<meta property="og:title" content="vitalops">
+<meta property="og:description" content="Plan an LLM deployment from a model and a GPU, then measure the server against the plan. Pure Python, no dependencies.">
+<meta property="og:url" content="https://vitalops.ai/oss/">
 <link rel="alternate" type="text/plain" href="agent-prompt.txt" title="Prompt for agents">
 <link rel="alternate" type="text/plain" href="llms.txt" title="Raw docs for agents">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -69,29 +69,30 @@ section{padding:32px 0}
 </head>
 <body>
 <header class="top"><div class="wrap top-in">
-  <a class="logo" href="./"><i>t</i>tokplan</a>
-  <nav class="links"><a href="docs/">Docs</a><a href="#demo">Demo</a><a href="https://github.com/vitalops/tokplan">GitHub</a><a href="https://pypi.org/project/tokplan/">PyPI</a></nav>
+  <a class="logo" href="./"><i>v</i>vitalops</a>
+  <nav class="links"><a href="docs/">Docs</a><a href="#demo">Planner</a><a href="#bench">Bench</a><a href="https://github.com/vitalops/vitalops">GitHub</a><a href="https://pypi.org/project/vitalops/">PyPI</a></nav>
 </div></header>
 
 <main>
 <section class="hero"><div class="wrap">
-  <span class="k">Inference planning · pure Python</span>
-  <h1>Will the model fit, how fast will it run, how many GPUs, what will it cost.</h1>
-  <p class="lede">tokplan reads a model's shapes from its <code>config.json</code> on the Hugging Face Hub, takes the GPU from a catalogue of datasheet figures, and applies a first-order model of inference: decode bound by memory bandwidth, prefill by compute, tensor parallelism over the real link. It finds the fewest GPUs that meet a time-to-first-token target and prices the result. No dependencies; Python 3.9 or newer.</p>
+  <span class="k">Open-source inference tooling · pure Python</span>
+  <h1>Plan an LLM deployment from a model and a GPU, then measure the server against the plan.</h1>
+  <p class="lede"><code>vitalops plan</code> answers whether a model fits, how fast it runs, how many GPUs it takes and what it costs. It reads a model's shapes from its <code>config.json</code> on the Hugging Face Hub, takes the GPU from a catalogue of datasheet figures, and applies a first-order model of inference: decode bound by memory bandwidth, prefill by compute, tensor parallelism over the real link. It finds the fewest GPUs that meet a time-to-first-token target and prices the result. <code>vitalops bench</code> then measures a running server at the concurrency you care about and prints the estimate next to each measurement. No dependencies; Python 3.9 or newer.</p>
   <div class="install">
-    <div><small>pip</small><pre>pip install tokplan
-tokplan Qwen/Qwen3-32B --gpu h100 --users 64</pre></div>
-    <div><small>one file, no install</small><pre>wget https://github.com/vitalops/tokplan/releases/download/onefile/tokplan.py
-python tokplan.py qwen3-32b</pre></div>
+    <div><small>pip</small><pre>pip install vitalops
+vitalops plan Qwen/Qwen3-32B --gpu h100 --users 64
+vitalops bench http://localhost:8000 --plan h100</pre></div>
+    <div><small>one file, no install</small><pre>wget https://github.com/vitalops/vitalops/releases/download/onefile/vitalops.py
+python vitalops.py plan qwen3-32b</pre></div>
   </div>
-  <a class="pill" href="docs/">Read the docs</a><a class="pill" href="docs/#cli">Command line</a><a class="pill" href="docs/#python-api">Python API</a>
+  <a class="pill" href="docs/">Read the docs</a><a class="pill" href="docs/#cli">vitalops plan</a><a class="pill" href="docs/#bench">vitalops bench</a><a class="pill" href="docs/#python-api">Python API</a>
 </div></section>
 
 <section><div class="wrap">
   <div class="sec-h"><h2>A report, from one line</h2><p>The shapes come from the Hub or the built-in catalogue; the GPU from the hardware catalogue; everything else is printed, including the assumptions.</p></div>
-<pre class="transcript"><span class="c">$</span> tokplan meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64
-tokplan · Llama-3.3-70B on H100 SXM
-───────────────────────────────────
+<pre class="transcript"><span class="c">$</span> vitalops meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64
+vitalops plan · Llama-3.3-70B on H100 SXM
+─────────────────────────────────────────
   model      70.6B params · 80 layers · KV 160 KB/token (fp8)
   weights    fp8 65.8 GiB · matmuls at 1,979 TFLOPS fp8
   traffic    64 concurrent requests × (2,048 in + 300 out) · TTFT target 500 ms
@@ -103,8 +104,8 @@ tokplan · Llama-3.3-70B on H100 SXM
   memory/GPU weights 32.9 GiB · KV 11.5 GiB · runtime 7.90 GiB · free 27.8 GiB of 80.0 GiB
   cost       $1.07 per 1M output tokens · $3,648 / month at $2.50 per GPU-hour
 
-<span class="c">$</span> tokplan qwen3-32b --all-gpus -q
-tokplan · Qwen3-32B · fp8 weights, fp8 KV · 64 × (2,048 in + 300 out) · TTFT target 500 ms
+<span class="c">$</span> vitalops qwen3-32b --all-gpus -q
+vitalops plan · Qwen3-32B · fp8 weights, fp8 KV · 64 × (2,048 in + 300 out) · TTFT target 500 ms
   GPU             GPUs  TP  tok/s/user  aggregate     TTFT  $/1M out
   ────────────────────────────────────────────────────────────────────
   H100 SXM           1   1        22.5      1,437   134 ms     $0.48
@@ -117,7 +118,7 @@ tokplan · Qwen3-32B · fp8 weights, fp8 KV · 64 × (2,048 in + 300 out) · TTF
 </div></section>
 
 <section id="demo"><div class="wrap">
-  <div class="sec-h"><h2>The command line, interactive</h2><p>Every figure in this panel comes from tokplan's Python source, loaded into <a href="https://pyodide.org">Pyodide</a> (about 7 MB on the first visit). The command that prints the same report is under "Command line". Any public Hugging Face model can be loaded from the model list. <code>tokplan ui</code> serves the same panel from the installed package.</p></div>
+  <div class="sec-h"><h2>The planner, interactive</h2><p>Every figure in this panel comes from vitalops's Python source, loaded into <a href="https://pyodide.org">Pyodide</a> (about 7 MB on the first visit). The command that prints the same report is under "Command line". Any public Hugging Face model can be loaded from the model list. <code>vitalops ui</code> serves the same panel from the installed package.</p></div>
   <div class="lab" data-lab-shell data-tabs="planner" data-gpu="h100"><noscript><p>The demo needs JavaScript.</p></noscript></div>
   <p class="lab-note">First-order estimates from public specifications, not measurements. Every formula is under "How this is calculated" in the panel.</p>
 </div></section>
@@ -130,9 +131,19 @@ tokplan · Qwen3-32B · fp8 weights, fp8 KV · 64 × (2,048 in + 300 out) · TTF
     <div class="card"><h3>Layout and cost</h3><p>Tensor parallelism costs two all-reduces per layer over the GPU's link, with 8 µs latency on NVLink or Infinity Fabric and 25 µs on PCIe. For each degree 1, 2, 4, 8 that fits, the KV cache sets the batch per replica and so the replica count; the fewest GPUs that meet the TTFT target win. Cost is GPUs × price per hour ÷ output tokens per hour.</p><p>Not modelled: queueing, speculative decoding, prefix caching, chunked prefill, kernel efficiency at small batches, pipeline or expert parallelism. The <a href="docs/#physics">physics page</a> has every formula.</p></div>
   </div>
 </div></section>
+<section id="bench"><div class="wrap">
+  <div class="sec-h"><h2>Measure it, next to the plan</h2><p><code>vitalops bench</code> sends concurrent streaming requests to any OpenAI-compatible server (vLLM, SGLang, TGI, llama.cpp, a hosted API) and reports what users see at each concurrency level. With <code>--plan</code>, the planner's estimate for the same traffic sits under each measured row, and large gaps are named.</p></div>
+<pre class="transcript"><span class="c">$</span> vitalops bench http://localhost:8000 --users 1,8,32,64 --prompt 1024 --output 256 --slo 500 --plan h100 --tp 1
+<span class="c">$</span> vitalops bench $ENDPOINT --users 32 --slo 400 --require 32 -q || exit 1     <span class="c"># in CI</span></pre>
+  <div class="cols">
+    <div class="card"><h3>What it reports</h3><p>Per concurrency level: time to first token and time between tokens at p50 and p95, tokens per second per stream and in total, requests per second, and failed requests. The capacity line is the most concurrent requests whose p95 TTFT meets the target.</p></div>
+    <div class="card"><h3>How it measures</h3><p>A closed loop per level, one keep-alive connection per worker, with the first request of each worker discarded as a warm-up. Prompts are random words calibrated to the server's own token counts, distinct per request unless <code>--shared-prefix</code> asks for a common system prompt. Outputs are held to the asked length where the server allows it, and the report says when it does not.</p></div>
+    <div class="card"><h3>Against the plan</h3><p>The plan is one replica on the GPU you name, at the measured concurrency. When TTFT runs far above it, requests are queueing behind other prefills; when a single stream runs far below it, small-batch overheads; when TTFT runs below it with a shared prefix, the prefix cache. The <a href="docs/#bench">bench docs</a> cover the rest.</p></div>
+  </div>
+</div></section>
 </main>
 
-<footer class="foot"><div class="wrap" style="display:contents"><span>MIT licence · <a href="https://github.com/vitalops/tokplan">github.com/vitalops/tokplan</a></span><span>by <a href="https://vitalops.ai">VitalOps</a></span></div></footer>
+<footer class="foot"><div class="wrap" style="display:contents"><span>MIT licence · <a href="https://github.com/vitalops/vitalops">github.com/vitalops/vitalops</a></span><span>by <a href="https://vitalops.ai">VitalOps</a></span></div></footer>
 
 <script>window.VO_HW_ROOT = 'https://vitalops.ai/';</script>
 <script src="hw.js"></script>

@@ -1,12 +1,12 @@
-"""tokplan: will the model fit, how fast will it run, how many GPUs, what will it cost.
+"""vitalops: will the model fit, how fast will it run, how many GPUs, what will it cost.
 
-    import tokplan
-    p = tokplan.plan("meta-llama/Llama-3.3-70B-Instruct", gpu="h100", users=64)
+    import vitalops
+    p = vitalops.plan("meta-llama/Llama-3.3-70B-Instruct", gpu="h100", users=64)
     print(p.layout.gpus, p.user_tps, p.cost_per_1m_output)
 
 A first-order model from public specifications: decode bound by memory bandwidth, prefill by
 compute, tensor parallelism over the real link. The numbers are estimates for planning, not
-measurements; see `tokplan --help` and the docs for every assumption.
+measurements; see `vitalops plan --help` and the docs for every assumption.
 """
 from __future__ import annotations
 

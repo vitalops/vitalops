@@ -8,7 +8,7 @@
 (function () {
   'use strict';
   var ROOT = (function () {
-    if (window.VO_HW_ROOT) return window.VO_HW_ROOT;      // a host page may point the photos elsewhere (tokplan ui does)
+    if (window.VO_HW_ROOT) return window.VO_HW_ROOT;      // a host page may point the photos elsewhere (vitalops ui does)
     var s = document.currentScript && document.currentScript.src;
     return s ? s.replace(/assets\/js\/hw\.js.*$/, '') : '';
   })();

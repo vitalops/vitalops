@@ -1,33 +1,33 @@
 # Install
 
-tokplan is pure Python with no dependencies. It needs Python 3.9 or newer and nothing else.
+vitalops is pure Python with no dependencies. It needs Python 3.9 or newer and nothing else.
 
 ## pip
 
 ```
-pip install tokplan
-tokplan --version
+pip install vitalops
+vitalops --version
 ```
 
-This installs the `tokplan` command and the `tokplan` package.
+This installs the `vitalops` command and the `vitalops` package.
 
 ## One file
 
 The whole package is also published as a single file that runs as a script or imports as a module:
 
 ```
-wget https://github.com/vitalops/tokplan/releases/download/onefile/tokplan.py
-python tokplan.py qwen3-32b
+wget https://github.com/vitalops/vitalops/releases/download/onefile/vitalops.py
+python vitalops.py plan qwen3-32b
 ```
 
-Put `tokplan.py` on `sys.path` and `import tokplan` works the same as the package. The interactive planner is embedded too, so `python tokplan.py ui` works from the one file.
+Put `vitalops.py` on `sys.path` and `import vitalops` works the same as the package. The interactive planner is embedded too, so `python vitalops.py ui` works from the one file.
 
 ## Check it works
 
 ```
-$ tokplan qwen3-32b --offline -q
-tokplan · Qwen3-32B on H100 SXM
-───────────────────────────────
+$ vitalops plan qwen3-32b --offline -q
+vitalops plan · Qwen3-32B on H100 SXM
+─────────────────────────────────────
   model      32.8B params · 64 layers · KV 128 KB/token (fp8)
   ...
 ```
@@ -37,7 +37,7 @@ tokplan · Qwen3-32B on H100 SXM
 ## From source
 
 ```
-git clone https://github.com/vitalops/tokplan && cd tokplan
+git clone https://github.com/vitalops/vitalops && cd vitalops
 pip install -e .[dev]
 pytest
 ```

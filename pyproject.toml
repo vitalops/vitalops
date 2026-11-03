@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tokplan"
+name = "vitalops"
 version = "0.1.0"
 description = "Will the model fit, how fast will it run, how many GPUs, what will it cost: a first-order inference planner for any Hugging Face model on any GPU, in pure Python."
 readme = "README.md"
@@ -18,17 +18,17 @@ classifiers = [
 ]
 
 [project.scripts]
-tokplan = "tokplan.cli:main"
+vitalops = "vitalops.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest"]
 
 [project.urls]
-Homepage = "https://vitalops.ai/tokplan/"
-Source = "https://github.com/vitalops/tokplan"
+Homepage = "https://vitalops.ai/oss/"
+Source = "https://github.com/vitalops/vitalops"
 
 [tool.setuptools.packages.find]
-include = ["tokplan*"]
+include = ["vitalops*"]
 
 [tool.setuptools.package-data]
-tokplan = ["ui/*"]
+vitalops = ["ui/*"]

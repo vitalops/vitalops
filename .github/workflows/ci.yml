@@ -16,4 +16,4 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install -e .[dev]
       - run: pytest -q
-      - run: python tools/onefile.py && python dist/tokplan.py qwen3-32b --offline -q
+      - run: python tools/onefile.py && python dist/vitalops.py plan qwen3-32b --offline -q

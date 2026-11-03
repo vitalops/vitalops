@@ -1,30 +1,31 @@
-# tokplan
+# vitalops
 
-> Will the model fit, how fast will it run, how many GPUs, what will it cost: a first-order inference planner for any Hugging Face model on any GPU, in pure Python with no dependencies.
+> Open-source tools for running LLM inference, in pure Python with no dependencies. `vitalops plan`: will the model fit, how fast will it run, how many GPUs, what will it cost, for any Hugging Face model on any GPU. `vitalops bench`: measure an OpenAI-compatible endpoint and compare it with the plan.
 
 ## Prompt
 
-- [Prompt for coding agents](https://vitalops.ai/tokplan/agent-prompt.txt): install, the API, the command line, what it is and is not
+- [Prompt for coding agents](https://vitalops.ai/oss/agent-prompt.txt): install, the API, the command line, what it is and is not
 
 ## Getting started
 
-- [Introduction](https://vitalops.ai/tokplan/docs/content/introduction.md): What tokplan does and does not do
-- [Install](https://vitalops.ai/tokplan/docs/content/install.md): pip, the one-file build, checking it works
-- [Command line](https://vitalops.ai/tokplan/docs/content/cli.md): every flag, the report line by line, exit codes, JSON output, the Hub
-- [Python API](https://vitalops.ai/tokplan/docs/content/python-api.md): plan, fit, perf, the Plan, Layout, Perf and Scenario dataclasses, the catalogues
+- [Introduction](https://vitalops.ai/oss/docs/content/introduction.md): What vitalops does and does not do
+- [Install](https://vitalops.ai/oss/docs/content/install.md): pip, the one-file build, checking it works
+- [vitalops plan](https://vitalops.ai/oss/docs/content/cli.md): every flag, the report line by line, exit codes, JSON output, the Hub
+- [vitalops bench](https://vitalops.ai/oss/docs/content/bench.md): measuring an endpoint across concurrency, against the plan, in CI
+- [Python API](https://vitalops.ai/oss/docs/content/python-api.md): plan, fit, perf, the Plan, Layout, Perf and Scenario dataclasses, the catalogues, bench
 
 ## What goes in
 
-- [Models](https://vitalops.ai/tokplan/docs/content/models.md): the built-in catalogue, the Hub loader, mixtures of experts, latent attention, caveats
-- [GPUs](https://vitalops.ai/tokplan/docs/content/gpus.md): the hardware catalogue, how each figure is used, hardware not in it
+- [Models](https://vitalops.ai/oss/docs/content/models.md): the built-in catalogue, the Hub loader, mixtures of experts, latent attention, caveats
+- [GPUs](https://vitalops.ai/oss/docs/content/gpus.md): the hardware catalogue, how each figure is used, hardware not in it
 
 ## How it works
 
-- [The physics](https://vitalops.ai/tokplan/docs/content/physics.md): every formula and constant, what is not modelled, calibrating against a measurement
-- [The interactive planner](https://vitalops.ai/tokplan/docs/content/ui.md): tokplan ui and the web page, which run tokplan's Python (Pyodide on the site, the local package under tokplan ui)
-- [Contributing](https://vitalops.ai/tokplan/docs/content/contributing.md): layout, tests, adding a GPU or a model, the one-file build
+- [The physics](https://vitalops.ai/oss/docs/content/physics.md): every formula and constant, what is not modelled, calibrating against a measurement
+- [vitalops ui](https://vitalops.ai/oss/docs/content/ui.md): vitalops ui and the web page, which run vitalops's Python (Pyodide on the site, the local package under vitalops ui)
+- [Contributing](https://vitalops.ai/oss/docs/content/contributing.md): layout, tests, adding a GPU or a model, the one-file build
 
 ## Source
 
-- [GitHub](https://github.com/vitalops/tokplan)
-- [PyPI](https://pypi.org/project/tokplan/)
+- [GitHub](https://github.com/vitalops/vitalops)
+- [PyPI](https://pypi.org/project/vitalops/)

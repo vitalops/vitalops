@@ -1,6 +1,6 @@
 # GPUs
 
-`tokplan gpus` lists the hardware catalogue. Every figure is from the vendor's datasheet except the price, which is a default you can override with `--price`, and the DRAM latency, which is an assumption the planner does not use (it is kept for parity with the kernel tools on vitalops.ai).
+`vitalops gpus` lists the hardware catalogue. Every figure is from the vendor's datasheet except the price, which is a default you can override with `--price`, and the DRAM latency, which is an assumption the planner does not use (it is kept for parity with the kernel tools on vitalops.ai).
 
 | Key | Name | Memory | Bandwidth | Dense TFLOPS | Interconnect, per direction | Power | Default $/h |
 |---|---|---|---|---|---|---|---|
@@ -26,11 +26,11 @@ Aliases: `h100-sxm`, `h200-sxm`, `5090`, `rtx-5090`, `mi300`, `a100-80gb`, `orin
 ## Comparing
 
 ```
-$ tokplan llama-70b --all-gpus -q
+$ vitalops plan llama-70b --all-gpus -q
 ```
 
 prints one row per GPU for the same scenario, with the layout, per-stream and aggregate rates, TTFT and cost per million output tokens; the Jetson is left out. A GPU that cannot hold the model with one request's KV cache in a group of up to eight says `does not fit up to TP8`.
 
 ## Hardware not in the catalogue
 
-Construct a `GPU` with the datasheet figures and pass it to `tokplan.plan`; see [Python API](#python-api). To add it to the catalogue for everyone, see [Contributing](#contributing): an entry in `tokplan/hw.py` with a link to the datasheet.
+Construct a `GPU` with the datasheet figures and pass it to `vitalops.plan`; see [Python API](#python-api). To add it to the catalogue for everyone, see [Contributing](#contributing): an entry in `vitalops/hw.py` with a link to the datasheet.

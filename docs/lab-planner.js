@@ -1,8 +1,8 @@
 /* Capacity planner: a first-order roofline estimate of what a model needs to serve
    a given load. Renders into every [data-lab="planner"]. No libraries, no network.
    GPU specifications and the hardware card come from assets/js/hw.js (window.VO_HW).
-   When window.VO_PLANNER_ENGINE is set (tokplan's docs site, `tokplan ui`), every figure comes from
-   tokplan's Python instead of the port below: engine.evaluate(state) returns tokplan.web.evaluate's dict. */
+   When window.VO_PLANNER_ENGINE is set (vitalops's docs site, `vitalops ui`), every figure comes from
+   vitalops's Python instead of the port below: engine.evaluate(state) returns vitalops.web.evaluate's dict. */
 (function () {
   'use strict';
 
@@ -175,8 +175,8 @@
     step: 'One decode step at the operating point: max(memory time, compute time) + communication.',
     comm: 'Tensor-parallel all-reduce time per step and its share of the step. None at TP 1.',
     mem: 'Memory of one GPU drawn as its stacks or channels; memory is interleaved across them, so each shows the same fill.',
-    hub: 'Any public Hugging Face repository id. Its config.json is fetched from the Hub and read by tokplan\'s loader; gated models need the command line with HF_TOKEN.',
-    cli: 'The tokplan command that prints this report, and its output for the current settings.',
+    hub: 'Any public Hugging Face repository id. Its config.json is fetched from the Hub and read by vitalops\'s loader; gated models need the command line with HF_TOKEN.',
+    cli: 'The vitalops command that prints this report, and its output for the current settings.',
     regime: 'Memory-bandwidth bound when the bytes read per step take longer than the matmuls at the rate used; compute bound otherwise.'
   };
   var CARD_TIPS = ['Datasheet: HBM stacks or GDDR channels and the capacity of each.', 'Datasheet peak memory bandwidth; the estimate uses 75% of it.', 'Datasheet dense tensor-core rate for the format the matmuls run in.', 'Streaming multiprocessors (NVIDIA) or compute units (AMD) from the datasheet.', 'GPU-to-GPU link and its usable bandwidth per direction, from the datasheet; it carries the tensor-parallel all-reduces.', 'Datasheet board power.'];
@@ -431,7 +431,7 @@
       });
     }
 
-    // tokplan.web.evaluate's dict, in the shape render() takes
+    // vitalops.web.evaluate's dict, in the shape render() takes
     function fromPy(res) {
       var P = res.plan;
       if (!P.fits) return { fail: true, weights: P.weight_bytes, act: res.runtime_bytes, memB: P.mem_bytes, reason: P.reason, perReq: P.kv_bytes_per_request };
@@ -500,7 +500,7 @@
     }
 
     function nice(v) { var e = Math.pow(10, Math.floor(Math.log10(v))), f = v / e; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * e; }
-    // pts: [{b, agg, user}] from tokplan.web, or computed here with the port's perf()
+    // pts: [{b, agg, user}] from vitalops.web, or computed here with the port's perf()
     function chart(s, r, pyPts) {
       var W = Math.round(Math.max(300, Math.min(640, X.chart.clientWidth || 600))), H = Math.round(Math.max(180, W * 0.36)), L = 40, R = 34, T = 12, B = 26;
       var maxB = Math.max(2, r.maxB), n = 48, pts = [];
@@ -569,7 +569,7 @@
       roots.forEach(function (root) {
         mount(root);
         var a = root.querySelector('[data-x="alert"]');
-        if (a) a.insertAdjacentHTML('beforebegin', '<div class="lp-alert">tokplan\'s Python did not load (' + HW.esc(String(err && err.message || err)) + '). These figures come from the JavaScript port of the same formulas.</div>');
+        if (a) a.insertAdjacentHTML('beforebegin', '<div class="lp-alert">vitalops\'s Python did not load (' + HW.esc(String(err && err.message || err)) + '). These figures come from the JavaScript port of the same formulas.</div>');
       });
     });
   }

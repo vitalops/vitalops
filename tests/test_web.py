@@ -5,7 +5,7 @@ import socket
 import threading
 import urllib.request
 
-from tokplan import web
+from vitalops import web
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -15,7 +15,7 @@ def test_evaluate_matches_the_report():
     p = r["plan"]
     assert p["fits"] and p["layout"]["gpus"] == 1
     assert round(p["user_tps"], 1) == 22.5 and round(p["agg_tps"]) == 1437 and round(p["ttft_ms"]) == 134
-    assert "22.5 tok/s per stream" in r["report"] and r["command"] == "tokplan Qwen/Qwen3-32B --gpu h100"
+    assert "22.5 tok/s per stream" in r["report"] and r["command"] == "vitalops plan Qwen/Qwen3-32B --gpu h100"
     assert r["chart"][0]["b"] == 1 and r["chart"][-1]["b"] == p["layout"]["max_batch"]
 
 
@@ -27,13 +27,13 @@ def test_evaluate_reports_errors_and_misfits():
 
 def test_command_lists_only_non_defaults():
     st = {"model": "llama-70b", "gpu": "l40s", "users": 32, "slo": 400, "weights": "fp8", "price": 1.0}
-    assert web.command(st) == "tokplan llama-70b --gpu l40s --users 32 --slo 400"
+    assert web.command(st) == "vitalops plan llama-70b --gpu l40s --users 32 --slo 400"
     st["price"] = 0.8
     assert web.command(st).endswith("--price 0.80")
 
 
 def test_preload_feeds_the_hub_loader(tmp_path, monkeypatch):
-    from tokplan import models
+    from vitalops import models
     monkeypatch.setattr(models, "CACHE_DIR", str(tmp_path))
     cfg = {"hidden_size": 2048, "num_hidden_layers": 24, "num_attention_heads": 16, "num_key_value_heads": 2, "intermediate_size": 8192, "vocab_size": 50000}
     web.preload("someone/tiny-model", cfg, None)
@@ -43,7 +43,7 @@ def test_preload_feeds_the_hub_loader(tmp_path, monkeypatch):
 
 
 def test_ui_server_api():
-    from tokplan import ui
+    from vitalops import ui
     import socketserver
     with socket.socket() as s:
         s.bind(("127.0.0.1", 0)); port = s.getsockname()[1]
