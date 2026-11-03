@@ -4,7 +4,7 @@
 
 Will the model fit, how fast will it run, how many GPUs, what will it cost.
 
-[Live demo](https://vitalops.github.io/tokplan/) · [Docs](https://vitalops.github.io/tokplan/docs/)
+[Live demo](https://vitalops.ai/tokplan/) · [Docs](https://vitalops.ai/tokplan/docs/)
 
 </div>
 
@@ -13,15 +13,15 @@ $ tokplan meta-llama/Llama-3.3-70B-Instruct --gpu h100 --users 64
 tokplan · Llama-3.3-70B on H100 SXM
 ───────────────────────────────────
   model      70.6B params · 80 layers · KV 160 KB/token (fp8)
-  weights    fp8 65.7 GiB · matmuls at 1,979 TFLOPS fp8
+  weights    fp8 65.8 GiB · matmuls at 1,979 TFLOPS fp8
   traffic    64 concurrent requests × (2,048 in + 300 out) · TTFT target 500 ms
 
-  layout     TP2 × 1 replica = 2 GPUs · batch 64 per replica (max 94)
-  decode     19.4 tok/s per stream · 1,243 tok/s aggregate · 4.14 requests/s
-  TTFT       275 ms = prefill 254 ms + one step 20.3 ms · target met
-  step       20.3 ms = weights 14.0 ms + KV 4.66 ms + all-reduces 1.65 ms (8%) · memory-bandwidth bound (compute floor 4.57 ms)
-  memory/GPU weights 32.9 GiB · KV 9.16 GiB · runtime 7.90 GiB · free 30.1 GiB of 80.0 GiB
-  cost       $1.12 per 1M output tokens · $3,648 / month at $2.50 per GPU-hour
+  layout     TP2 × 1 replica = 2 GPUs · batch 64 per replica (max 218)
+  decode     20.4 tok/s per stream · 1,304 tok/s aggregate · 4.35 requests/s
+  TTFT       155 ms = prefill 135 ms + one step 20.3 ms · target met
+  step       20.3 ms = weights 14.0 ms + KV 4.59 ms + all-reduces 1.65 ms (8%) · memory-bandwidth bound (compute floor 4.57 ms)
+  memory/GPU weights 32.9 GiB · KV 11.5 GiB · runtime 7.90 GiB · free 27.8 GiB of 80.0 GiB
+  cost       $1.07 per 1M output tokens · $3,648 / month at $2.50 per GPU-hour
 ```
 
 tokplan reads a model's shapes from its `config.json` on the Hugging Face Hub (or from a built-in

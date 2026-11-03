@@ -1,0 +1,7 @@
+{
+  "parts": [
+    { "title": "Getting started", "pages": [["introduction", "Introduction"], ["install", "Install"], ["cli", "Command line"], ["python-api", "Python API"]] },
+    { "title": "What goes in", "pages": [["models", "Models"], ["gpus", "GPUs"]] },
+    { "title": "How it works", "pages": [["physics", "The physics"], ["ui", "The interactive planner"], ["contributing", "Contributing"]] }
+  ]
+}

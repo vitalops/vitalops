@@ -24,7 +24,7 @@ tokplan = "tokplan.cli:main"
 dev = ["pytest"]
 
 [project.urls]
-Homepage = "https://vitalops.github.io/tokplan/"
+Homepage = "https://vitalops.ai/tokplan/"
 Source = "https://github.com/vitalops/tokplan"
 
 [tool.setuptools.packages.find]
